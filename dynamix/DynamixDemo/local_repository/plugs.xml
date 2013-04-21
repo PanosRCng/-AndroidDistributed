@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contextPlugins version="1.0.0" xmlns:android="http://schemas.android.com/apk/res/android">
+ 
+   <contextPlugin 
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.batterylevel"
+        pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.batterylevel.PluginFactory">
+		<name>Battery Plugin</name>
+		<description>Battery</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides configurable sample data in bytes. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.batterylevel</contextType>
+		</supportedContextTypes>
+		<permissions/>
+		<installUrl>/dynamix/org.ambientdynamix.contextplugins.batterylevel_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+    </contextPlugin>	
+
+</contextPlugins>
