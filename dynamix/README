@@ -1,0 +1,10 @@
+A hello world on Dynamix Framework
+
+
+DynamixDemo:
+
+	an android app tha uses the dynamix framework to get the phone battery level, calling the batteryDemo plugin
+
+BatteryDemoPLugin:
+
+	a demo plugin for Dynamix framework that help an android app to get the phone battery level 
