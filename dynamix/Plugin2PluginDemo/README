@@ -1,0 +1,8 @@
+A Dynamix Demo: Plugin1 call Plugin2 throw dynamix framework
+
+- the dynamix app
+- plugin1 and plugin 2
+- the local repository
+
+to do:
+	make the two plugins to communicate
