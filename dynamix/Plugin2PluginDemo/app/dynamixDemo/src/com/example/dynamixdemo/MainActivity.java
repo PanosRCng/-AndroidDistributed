@@ -176,7 +176,7 @@ public class MainActivity extends Activity {
 	    et.append("message_data: " + data + "\n");
 	  }
 	};
-	
+		
 	// Send an Intent to MainActivity with message_data -- used to update UI from Dynamix events   
 	private void sendMessage(String data) {
 	  Intent intent = new Intent("message_intent");
@@ -243,7 +243,7 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onContextEvent(ContextEvent event) throws RemoteException {
-		      
+		      			
 			  String representation = event.getStringRepresentation("text/plain");
 			  
 			  // handle context event from plugin1
@@ -251,7 +251,7 @@ public class MainActivity extends Activity {
 			  {
 				  String[] splits = representation.split("=");	  
 				  String number1 = splits[1];
-				  
+				  				  
 				  sendMessage(number1);
 				  
 				  summonPlugin("org.ambientdynamix.contextplugins.plugin2");
