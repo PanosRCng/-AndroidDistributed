@@ -46,9 +46,12 @@ public class Plugin1Runtime extends AutoReactiveContextPluginRuntime {
 
 	@Override
 	public void handleConfiguredContextRequest(UUID requestId, String contextType, Bundle config) {
-		Log.w(TAG, "handleConfiguredContextRequest called, but we don't support configuration");
-		// Drop the config and default to handleContextRequest
-		handleContextRequest(requestId, contextType);
+		
+		String data = (String) config.get("data");
+		
+		Log.i(TAG, "ok i fucking get the fucking data: " + data);
+		
+	//	handleContextRequest(requestId, contextType);
 	}	
 	
 	@Override
