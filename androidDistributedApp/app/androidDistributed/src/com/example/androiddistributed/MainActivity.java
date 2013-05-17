@@ -21,6 +21,9 @@ public class MainActivity extends Activity {
 		
 		// connect to dynamix framework
 		scheduler.connect_to_dynamix(context);
+	
+		// commit job/plugin test to dynamix framework
+		scheduler.commitJob("org.ambientdynamix.contextplugins.counterplugin");
 	}
 
 	@Override

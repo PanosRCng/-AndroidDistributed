@@ -1,5 +1,6 @@
 package com.example.androiddistributed;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ambientdynamix.api.application.ContextEvent;
@@ -13,6 +14,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
@@ -23,6 +25,9 @@ public class Scheduler {
 	private final String TAG = this.getClass().getSimpleName();
 	
 	IDynamixFacade dynamix;
+	
+    ArrayList<String> jobs = new ArrayList<String>();
+
 	
 	// scheduler constructor
 	public Scheduler()
@@ -37,14 +42,23 @@ public class Scheduler {
 		{
 			context.bindService(new Intent(IDynamixFacade.class.getName()), sConnection, Context.BIND_AUTO_CREATE);
 			Log.i(TAG, "Connecting to Dynamix...\n");
-		} else {
-			try {
-				if (!dynamix.isSessionOpen()) {
+		}
+		else
+		{
+			try
+			{
+				if (!dynamix.isSessionOpen())
+				{
 					Log.i(TAG, "Dynamix connected... trying to open session\n");
 					dynamix.openSession();
-				} else
+				}
+				else
+				{
 					Log.i(TAG, "Session is already open\n");
-			} catch (RemoteException e) {
+				}
+			}
+			catch (RemoteException e)
+			{
 				Log.e(TAG, e.toString());
 			}
 		}
@@ -105,21 +119,40 @@ public class Scheduler {
 		@Override
 		public void onDynamixListenerAdded(String listenerId) throws RemoteException {
 			Log.i(TAG, "A1 - onDynamixListenerAdded for listenerId: " + listenerId);
-			// Open a Dynamix Session if it's not already opened
-			if (dynamix != null) {
+						
+			// Open a Dynamix Session if it's not already opened, otherwise start commited jobs
+			if (dynamix != null)
+			{
 				if (!dynamix.isSessionOpen())
+				{
 					dynamix.openSession();
-			} else
+				}
+				else
+				{
+					startJobs();
+				}
+			}
+			else
+			{				
 				Log.i(TAG, "dynamix already connected");
+			}
 		}
 		
 		// catch events from our plugin
 
 		@Override
-		public void onContextEvent(ContextEvent event) throws RemoteException {
-		      			
-		//	  String representation = event.getStringRepresentation("text/plain");
-			  
+		public void onContextEvent(ContextEvent event) throws RemoteException
+		{
+			  String representation = event.getStringRepresentation("text/plain");
+		
+			  if( representation.contains("counter=") )
+			  {
+				  Log.i(TAG, "get event from counterPlugin");
+				  
+				  String contextType = event.getContextType();
+				  
+				  stopPlugin(contextType);
+			  }
 		}
 		
 		
@@ -133,6 +166,9 @@ public class Scheduler {
 		@Override
 		public void onSessionOpened(String sessionId) throws RemoteException {
 			Log.i(TAG, "A1 - onSessionOpened");
+			
+			// start commited jobs
+			startJobs(); 
 		}
 
 		@Override
@@ -160,9 +196,17 @@ public class Scheduler {
 			Log.i(TAG,
 					"A1 - onContextSupportAdded for " + supportInfo.getContextType() + " using plugin "
 							+ supportInfo.getPlugin() + " | id was: " + supportInfo.getSupportId());
+			
+			String contextType = supportInfo.getContextType(); 
 
-	//		String contextType = supportInfo.getContextType(); 
-						
+			try
+			{
+				sendRequest(contextType);
+			}
+			catch (Exception e)
+			{
+				Log.i(TAG, e.toString());
+			}
 		}
 
 		@Override
@@ -194,6 +238,8 @@ public class Scheduler {
 		@Override
 		public void onContextPluginUninstalled(ContextPluginInformation plug) throws RemoteException {
 			Log.i(TAG, "A1 - onContextPluginUninstalled for " + plug);
+			
+			summonPlugin("org.ambientdynamix.contextplugins.counterplugin");
 		}
 
 		@Override
@@ -233,5 +279,149 @@ public class Scheduler {
 		}
 		
 	};
+	
+	//	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@	//
+	
+	
+	// call to synamix commit a plugin to dynamix framework
+	public void commitJob(String contextType)
+	{
+		jobs.add(contextType);
+
+		try
+		{
+			// Open a Dynamix Session if it's not already opened, otherwise start commited jobs
+			if (dynamix != null)
+			{
+				if (!dynamix.isSessionOpen())
+				{
+					dynamix.openSession();	// open session -- onSessionOpened we call and there startJobs()
+				}
+				else
+				{				
+					startJobs();
+				}
+			}
+
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+		
+	}
+	
+	// start commited jobs
+	private void startJobs()
+	{
+		// start all jobs in job list
+		for (String contextType : jobs)
+		{
+			try
+			{
+				summonPlugin(contextType);
+			}
+			catch (Exception e)
+			{
+				Log.w(TAG, e.toString());
+			}
+			
+			// clear job list
+			jobs.clear();
+		}
+	}
+	
+	
+	// add context support using plugin context type 
+	private void summonPlugin(String contextType) throws RemoteException {
+			
+		Result result1 = dynamix.addContextSupport(dynamixCallback, contextType);
+		if (!result1.wasSuccessful())
+			Log.w(TAG,
+					"Call was unsuccessful! Message: " + result1.getMessage() + " | Error code: "
+							+ result1.getErrorCode());	
+		
+	}
+		
+	// send context request to plugin with context type contextType
+	private void sendRequest(String contextType) throws RemoteException, InterruptedException
+	{
+			String requestId = contextType;			
+			dynamix.contextRequest(dynamixCallback, requestId, contextType);
+	}
+	
+	// send configured request to plugin with context type contextType and a bundle
+	private void sendConfiguredRequest(String contextType, Bundle config) throws RemoteException, InterruptedException
+	{
+		String requestId = contextType;		
+		dynamix.configuredContextRequest(dynamixCallback, requestId, contextType, config);
+	}
+	
+	// stop plugin with ContextType contextType
+	private void stopPlugin(String contextType)
+	{
+		// set stop Bundle
+		Bundle stop = new Bundle();
+		stop.putString("command", "stop");
+		
+		try
+		{
+			sendConfiguredRequest(contextType, stop);
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+	}
+	
+	// start plugin with ContextType contextType
+	private void startPlugin(String contextType)
+	{
+		// set start Bundle
+		Bundle start = new Bundle();
+		start.putString("command", "start");
+		
+		try
+		{
+			
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+	}
+	
+	// destroy plugin with ContextType contextType
+	private void destroyPlugin(String contextType)
+	{
+		// set destroy Bundle
+		Bundle destroy = new Bundle();
+		destroy.putString("command", "destroy");
+		
+		try
+		{
+			
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+	}
+	
+	private void pausePlugin(String contextType)
+	{
+		//set pause bundle
+		Bundle pause = new Bundle();
+		pause.putString("command", "pause");
+		
+		try
+		{
+			
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+	}
 	
 }
