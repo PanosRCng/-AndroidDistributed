@@ -1,11 +1,14 @@
 package com.example.androiddistributed;
 
-import java.util.ArrayList;
+import java.io.FileOutputStream;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 import org.ambientdynamix.api.application.ContextEvent;
 import org.ambientdynamix.api.application.ContextPluginInformation;
 import org.ambientdynamix.api.application.ContextSupportInfo;
+
 import org.ambientdynamix.api.application.IDynamixFacade;
 import org.ambientdynamix.api.application.IDynamixListener;
 import org.ambientdynamix.api.application.Result;
@@ -15,28 +18,61 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
 
-public class Scheduler {
-	
+public class Scheduler extends Thread implements Runnable {
+		
 	// get TAG name for reporting to LogCat
 	private final String TAG = this.getClass().getSimpleName();
 	
+	private Handler handler;
+	private Context context;
+	
 	IDynamixFacade dynamix;
+	private SensorProfiler sensorProfiler;
+	private Reporter reporter;
+	private Job currentJob;
+	private int resultCounter;
 	
-    ArrayList<String> jobs = new ArrayList<String>();
-
+	Stack jobs;
+    Map<String, Boolean> sensorsPermissions;
 	
-	// scheduler constructor
-	public Scheduler()
+    private boolean free_to_commit = true;
+	
+    // scheduler constructor
+	public Scheduler(Handler handler, Context context, SensorProfiler sensorProfiler, Reporter reporter)
 	{
-		//
+		this.handler = handler;
+		this.context = context;
+		this.sensorProfiler = sensorProfiler;
+		this.reporter = reporter;
+		
+		currentJob = new Job();
+		jobs = new Stack();
+		
+		// get list of available sensors
+		sensorsPermissions = sensorProfiler.getSensorsPermissions();
+	}
+	
+	public void run()
+	{	
+		try
+		{
+			Log.d(TAG, "running");
+			Thread.sleep(1000); //This could be something computationally intensive.
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	// connect to dynamix framework - needs the application's context to bind the dynamix service
-    public void connect_to_dynamix(Context context)
+    public void connect_to_dynamix()
     {
 		if (dynamix == null)
 		{
@@ -51,10 +87,12 @@ public class Scheduler {
 				{
 					Log.i(TAG, "Dynamix connected... trying to open session\n");
 					dynamix.openSession();
+					
 				}
 				else
 				{
 					Log.i(TAG, "Session is already open\n");
+					sendThreadMessage("dynamix_connected");
 				}
 			}
 			catch (RemoteException e)
@@ -129,7 +167,8 @@ public class Scheduler {
 				}
 				else
 				{
-					startJobs();
+					sendThreadMessage("dynamix_connected");
+					startJob();
 				}
 			}
 			else
@@ -142,19 +181,20 @@ public class Scheduler {
 
 		@Override
 		public void onContextEvent(ContextEvent event) throws RemoteException
-		{
-			  String representation = event.getStringRepresentation("text/plain");
-		
-			  if( representation.contains("counter=") )
-			  {
-				  Log.i(TAG, "get event from counterPlugin");
-				  
-				  String contextType = event.getContextType();
-				  
-				  stopPlugin(contextType);
-			  }
+		{			  
+			String representation = event.getStringRepresentation("text/plain");
+			ContextPluginInformation cpInfo = event.getEventSource();
+			String srcPluginId = cpInfo.getPluginId();
+			
+			if( srcPluginId.equals( currentJob.getContextType() ) )
+			{		
+				currentJob.getMsg(representation);
+			}
+			else
+			{	
+				currentJob.getMsg(srcPluginId, representation);		
+			}
 		}
-		
 		
 		// events about the interaction with the dynamix framework
 		
@@ -167,13 +207,17 @@ public class Scheduler {
 		public void onSessionOpened(String sessionId) throws RemoteException {
 			Log.i(TAG, "A1 - onSessionOpened");
 			
+			sendThreadMessage("dynamix_connected");
+			
 			// start commited jobs
-			startJobs(); 
+			startJob(); 
 		}
 
 		@Override
 		public void onSessionClosed() throws RemoteException {
 			Log.i(TAG, "A1 - onSessionClosed");
+			
+			sendThreadMessage("dynamix_disconnected");
 		}
 
 		@Override
@@ -197,26 +241,42 @@ public class Scheduler {
 					"A1 - onContextSupportAdded for " + supportInfo.getContextType() + " using plugin "
 							+ supportInfo.getPlugin() + " | id was: " + supportInfo.getSupportId());
 			
-			String contextType = supportInfo.getContextType(); 
+			free_to_commit = true;
+			
+			if( currentJob.getState() == "none" )
+			{
+				startPlugin( currentJob.getContextType() );
+			}
 
-			try
-			{
-				sendRequest(contextType);
-			}
-			catch (Exception e)
-			{
-				Log.i(TAG, e.toString());
-			}
+			startJob();	
 		}
 
 		@Override
 		public void onContextSupportRemoved(ContextSupportInfo supportInfo) throws RemoteException {
 			Log.i(TAG, "A1 - onContextSupportRemoved for " + supportInfo.getSupportId());
+			
+			if( supportInfo.getContextType().equals(currentJob.getContextType()) )
+			{
+				currentJob.setState("pending_stopping");
+			}
+			
+			if( currentJob.getState().equals("pending_stopping") )
+			{
+				currentJob.setWakedDependency(supportInfo.getContextType(), false);	
+				
+				if(!currentJob.isDependenciesWaked())
+				{
+					currentJob.setState("stopped");
+				}
+			}
 		}
 
 		@Override
 		public void onContextTypeNotSupported(String contextType) throws RemoteException {
 			Log.i(TAG, "A1 - onContextTypeNotSupported for " + contextType);
+
+			free_to_commit = true;
+			startJob();
 		}
 
 		@Override
@@ -238,8 +298,6 @@ public class Scheduler {
 		@Override
 		public void onContextPluginUninstalled(ContextPluginInformation plug) throws RemoteException {
 			Log.i(TAG, "A1 - onContextPluginUninstalled for " + plug);
-			
-			summonPlugin("org.ambientdynamix.contextplugins.counterplugin");
 		}
 
 		@Override
@@ -277,16 +335,28 @@ public class Scheduler {
 		public void onContextPluginError(ContextPluginInformation plug, String message) throws RemoteException {
 			Log.i(TAG, "A1 - onContextPluginError for " + plug + " with message " + message);
 		}
+
+		@Override
+		public void onContextPluginInstallProgress(
+				ContextPluginInformation arg0, int arg1) throws RemoteException {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	};
+	
+	
 	
 	//	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@	//
 	
 	
-	// call to synamix commit a plugin to dynamix framework
+	// call to synamix commit a job plugin to dynamix framework
 	public void commitJob(String contextType)
 	{
-		jobs.add(contextType);
+		currentJob = new Job(contextType, this);
+		resultCounter=0;
+		
+		jobs.push(contextType);
 
 		try
 		{
@@ -299,7 +369,35 @@ public class Scheduler {
 				}
 				else
 				{				
-					startJobs();
+					startJob();
+				}
+			}
+
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+		
+	}
+	
+	// call to synamix commit a dependency plugin to dynamix framework
+	public void commitDependency(String contextType)
+	{
+		jobs.push(contextType);
+			
+		try
+		{
+			// Open a Dynamix Session if it's not already opened, otherwise start commited jobs
+			if (dynamix != null)
+			{
+				if (!dynamix.isSessionOpen())
+				{
+					dynamix.openSession();	// open session -- onSessionOpened we call and there startJobs()
+				}
+				else
+				{				
+					startJob();
 				}
 			}
 
@@ -312,42 +410,50 @@ public class Scheduler {
 	}
 	
 	// start commited jobs
-	private void startJobs()
-	{
-		// start all jobs in job list
-		for (String contextType : jobs)
+	private void startJob()
+	{				
+		if( !(jobs.isEmpty()) && (free_to_commit) )
 		{
+			String jobContextType = (String) jobs.pop();
+			
 			try
-			{
-				summonPlugin(contextType);
+			{				
+				free_to_commit = false;
+				summonPlugin(jobContextType);
 			}
 			catch (Exception e)
 			{
 				Log.w(TAG, e.toString());
 			}
-			
-			// clear job list
-			jobs.clear();
 		}
+		
 	}
 	
 	
 	// add context support using plugin context type 
-	private void summonPlugin(String contextType) throws RemoteException {
-			
+	private void summonPlugin(String contextType) throws RemoteException
+	{				
 		Result result1 = dynamix.addContextSupport(dynamixCallback, contextType);
 		if (!result1.wasSuccessful())
 			Log.w(TAG,
 					"Call was unsuccessful! Message: " + result1.getMessage() + " | Error code: "
 							+ result1.getErrorCode());	
-		
+	}
+	
+	public void deletePlugin(String contextType) throws RemoteException
+	{
+		Result result1 = dynamix.removeContextSupportForContextType(dynamixCallback, contextType);
+		if (!result1.wasSuccessful())
+			Log.w(TAG,
+					"Call was unsuccessful! Message: " + result1.getMessage() + " | Error code: "
+							+ result1.getErrorCode());	
 	}
 		
 	// send context request to plugin with context type contextType
 	private void sendRequest(String contextType) throws RemoteException, InterruptedException
 	{
-			String requestId = contextType;			
-			dynamix.contextRequest(dynamixCallback, requestId, contextType);
+		String requestId = contextType;			
+		dynamix.contextRequest(dynamixCallback, requestId, contextType);
 	}
 	
 	// send configured request to plugin with context type contextType and a bundle
@@ -357,16 +463,17 @@ public class Scheduler {
 		dynamix.configuredContextRequest(dynamixCallback, requestId, contextType, config);
 	}
 	
-	// stop plugin with ContextType contextType
-	private void stopPlugin(String contextType)
-	{
-		// set stop Bundle
-		Bundle stop = new Bundle();
-		stop.putString("command", "stop");
+	// pass data to experiment plugin from a dependency plugin
+	public void sendData(String srcPluginId, String dstPluginId, String data)
+	{		
+		// set start Bundle
+		Bundle send = new Bundle();
+		send.putString("command", srcPluginId);
+		send.putString("data", data);
 		
 		try
 		{
-			sendConfiguredRequest(contextType, stop);
+			sendConfiguredRequest(dstPluginId, send);
 		}
 		catch (Exception e)
 		{
@@ -374,16 +481,62 @@ public class Scheduler {
 		}
 	}
 	
+	// stop plugin with ContextType contextType
+	private void stopPlugin(String pluginId)
+	{
+		// set stop Bundle
+		Bundle stop = new Bundle();
+		stop.putString("command", "stop");
+		
+		try
+		{
+			sendConfiguredRequest(pluginId, stop);
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+			
+/*		try
+		{
+			dynamix.stopPlugin(pluginId);
+			
+			Log.i(TAG, "trying stop plugin with pluginId: " + pluginId );
+		}
+		catch(Exception e)
+		{
+			Log.i(TAG, e.toString());
+		}
+*/
+	}
+	
 	// start plugin with ContextType contextType
 	private void startPlugin(String contextType)
-	{
+	{		
 		// set start Bundle
 		Bundle start = new Bundle();
 		start.putString("command", "start");
 		
 		try
 		{
-			
+			sendConfiguredRequest(contextType, start);
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+	}
+	
+	// init plugin with ContextType contextType
+	public void initPlugin(String contextType)
+	{		
+		// set start Bundle
+		Bundle init = new Bundle();
+		init.putString("command", "init");
+		
+		try
+		{
+			sendConfiguredRequest(contextType, init);
 		}
 		catch (Exception e)
 		{
@@ -416,7 +569,7 @@ public class Scheduler {
 		
 		try
 		{
-			
+
 		}
 		catch (Exception e)
 		{
@@ -424,4 +577,75 @@ public class Scheduler {
 		}
 	}
 	
+	public void doJobPlugin(String contextType)
+	{		
+		//set do bundle
+		Bundle dojob = new Bundle();
+		dojob.putString("command", "do");
+		
+		try
+		{
+			sendConfiguredRequest(contextType, dojob);	
+		}
+		catch (Exception e)
+		{
+			Log.w(TAG, e.toString());
+		}
+	}
+	
+	public void storeResult(String data)
+	{
+		resultCounter++;
+		
+		String FILENAME = currentJob.getContextType()+"_store";		
+		data = data + System.getProperty("line.separator");
+		
+		try
+		{
+			FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_APPEND | Context.MODE_PRIVATE);
+			fos.write(data.getBytes());
+			fos.close();
+		}
+		catch(Exception e)
+		{
+			Log.e(TAG, e.toString());
+		}
+		
+		if(resultCounter > 5)
+		{			
+			String jobId = currentJob.getContextType();
+			
+			try
+			{
+				deletePlugin(currentJob.getContextType());
+				currentJob = null;
+			}
+			catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
+			
+			reporter.report(jobId);	
+		}
+	}
+	
+	public void sendThreadMessage(String message)
+	{
+		Message msg = new Message();
+		msg.obj = message;
+		handler.sendMessage(msg);
+	}
+	
+	public void stopCurrentPlugin()
+	{				
+		try
+		{
+			deletePlugin(currentJob.getContextType());
+		}
+		catch(Exception e)
+		{
+			Log.e(TAG, e.toString());
+		}
+	}
+			
 }
