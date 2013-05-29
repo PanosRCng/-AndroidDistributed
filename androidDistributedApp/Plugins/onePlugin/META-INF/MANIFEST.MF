@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Plugin 1
+Bundle-SymbolicName: org.ambientdynamix.contextplugins.oneplugin
+Bundle-Version: 9.47.1
+Bundle-ClassPath: .,lib/org.ambientdynamix.contextplugin.api_v0.9.47.j
+ ar
+Bundle-Vendor: Ambient Dynamix Project
+Export-Package: org.ambientdynamix.api.application,org.ambientdynamix.
+ api.contextplugin,org.ambientdynamix.api.contextplugin.security
+
