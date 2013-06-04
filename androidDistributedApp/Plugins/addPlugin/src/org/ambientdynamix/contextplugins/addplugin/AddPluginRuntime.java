@@ -1,6 +1,5 @@
 package org.ambientdynamix.contextplugins.addplugin;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,6 +12,7 @@ import org.ambientdynamix.api.contextplugin.security.SecuredContextInfo;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 
 
@@ -21,18 +21,32 @@ public class AddPluginRuntime extends AutoReactiveContextPluginRuntime {
 	private final String TAG = this.getClass().getSimpleName();
 	// Our secure context
 	private Context context;
-	
 	private List<String> dependencies;	
-	UUID requestId;
-	
 	private String dependency1 = "org.ambientdynamix.contextplugins.oneplugin";
 	private String dependency2 = "org.ambientdynamix.contextplugins.twoplugin";
 	
-	private double number1 = 0;
-	private double number2 = 0;
-	private double result = 0;
+	private int samples = 10;
+	private int sample_counter = 0;
 	
+	private double batteryLevel = 0.0;
+	private long time = 0;
+	private Bundle results;
+	
+	private String state;
 	private boolean running;
+	private Handler handler;
+	private Runnable runnable = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			if(running)
+			{	
+				doJob();
+				handler.postDelayed(this, 20000);
+			}
+		}
+	};
 	
 	@Override
 	public void init(PowerScheme powerScheme, ContextPluginSettings settings) throws Exception {
@@ -41,10 +55,10 @@ public class AddPluginRuntime extends AutoReactiveContextPluginRuntime {
 		// Store our secure context
 		this.context = this.getSecuredContext();
 		
-		// set experiment dependencies as a list of ContextTypes of standard plugins
-		dependencies = new ArrayList<String>();
-		dependencies.add(dependency1);
-		dependencies.add(dependency2);
+		results = new Bundle();
+		
+		state = "not_ready";
+		handler = new Handler();
 		running = false;
 	}
 
@@ -62,81 +76,58 @@ public class AddPluginRuntime extends AutoReactiveContextPluginRuntime {
 	}
 
 	@Override
-	public void handleConfiguredContextRequest(UUID requestId, String contextType, Bundle config) {
-		
-		// store caller application UUID - interact only with that, until stop 
-		this.requestId = requestId;
-		
+	public void handleConfiguredContextRequest(UUID requestId, String contextType, Bundle config)
+	{			
 		// get command
 		String command = (String) config.get("command");
-		// get data
-		String data = (String) config.get("data");
-		
-		if( command.equals("do") )
+				
+		if( command.equals("ping") )
 		{
-			running = true;
+			sendState();
+		}
+		else if( command.equals("do") )
+		{
+			startDoJob();
 		}
 		else if( command.equals(dependency1) )
 		{
-			number1 = Double.parseDouble(data);
-			doJob();
+			batteryLevel = (Double) config.getDouble("data");
 		}
 		else if( command.equals(dependency2) )
 		{
-			number2 = Double.parseDouble(data);
-			doJob();
+			time = (Long) config.getLong("data");
 		}
 		else if( command.equals("start") )
 		{
 			start();
 		}
-		else if( command.equals("init") )
-		{
-			callForDependencies();
-		}
 		else if( command.equals("stop") )
 		{
 			stop();
-		}
-		else if( command.equals("destroy") )
-		{
-			destroy();
-		}
-		else if( command.equals("pause") )
-		{
-			 // pause();
 		}
 		else
 		{
 			Log.i(TAG, "command not supported");
 		}
-		
-		if( command.equals(dependency1) )
-		{
-			number1 = Double.parseDouble(data);
-		}
-		else if( command.equals(dependency2) )
-		{
-			number2 = Double.parseDouble(data);
-		}
-		
-	//	handleContextRequest(requestId, contextType);
 	}	
 	
 	@Override
-	public void start() {
-		Log.d(TAG, "Started!");
-		
-		sendStatusMsg("started");
+	public void start()
+	{
+		Log.d(TAG, "ready!");	
+		setState("ready");
 	}
 	
 	@Override
-	public void stop() {
-		
+	public void stop()
+	{	
 		/*
 		 * At this point, the plug-in should stop scanning for context and/or handling context requests; however, we
 		 * should retain resources needed to run again.
 		 */
+		
+		running = false;
+		setState("stopped");
 		Log.d(TAG, "Stopped!");
 	}
 
@@ -162,34 +153,43 @@ public class AddPluginRuntime extends AutoReactiveContextPluginRuntime {
 	public void doManualContextScan() {
 		// Not supported
 	}
-		
-	private void callForDependencies()
+	
+	private void startDoJob()
 	{
-		String message = "";
-		for( String dependency : dependencies )
-		{
-			message = message + "@" + dependency;
-		}
-		
-		AddPluginInfo info = new AddPluginInfo(message);
-				
-		sendBroadcastContextEvent(new SecuredContextInfo(info, PrivacyRiskLevel.LOW), 60000);
+		running = true;
+		setState("running");
+		handler.postDelayed(runnable, 20000);
 	}
 	
 	private void doJob()
 	{
-		result = number1 + number2;
-		Log.i(TAG, "result= " + result);
+		Log.i(TAG, "doing happy job");
+				
+		long currentTime = System.currentTimeMillis();
+		long latency = currentTime - this.time;
+				
+		results.putDouble(Long.toString(latency), this.batteryLevel);
 		
-		String message = Double.toString(result);
-		AddPluginInfo info = new AddPluginInfo(message);
-		this.sendBroadcastContextEvent(new SecuredContextInfo(info, PrivacyRiskLevel.LOW), 60000);
+		sample_counter++;
+		if(sample_counter > samples)
+		{
+			running = false;
+			setState("finished");			
+		}
+	}
+		
+	private void setState(String state)
+	{
+		this.state = state;
+		sendState();
 	}
 	
-	private void sendStatusMsg(String msg)
+	private void sendState()
 	{
-		String message = msg;
-		AddPluginInfo info = new AddPluginInfo(message);
+		AddPluginInfo info = new AddPluginInfo(this.state);
+		
+		info.setData(this.results);
+		
 		this.sendBroadcastContextEvent(new SecuredContextInfo(info, PrivacyRiskLevel.LOW), 60000);
-	}
+	}  
 }

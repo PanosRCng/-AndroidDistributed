@@ -30,8 +30,8 @@ public final class R {
         public static final int ic_tab_jobs=0x7f020006;
         public static final int ic_tab_profile=0x7f020007;
         public static final int job_initialized=0x7f020008;
-        public static final int job_none=0x7f020009;
-        public static final int job_paused=0x7f02000a;
+        public static final int job_paused=0x7f020009;
+        public static final int job_ready=0x7f02000a;
         public static final int job_running=0x7f02000b;
         public static final int job_stoped=0x7f02000c;
         public static final int job_wait=0x7f02000d;

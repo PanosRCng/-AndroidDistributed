@@ -47,8 +47,8 @@ class TwoPluginInfo implements IContextInfo, ITwoPluginInfo {
 	};
 	// Public static variable for our supported context type
 	public static String CONTEXT_TYPE = "org.ambientdynamix.contextplugins.twoplugin";
-	
-	private double counter = 0;
+	private String state;
+	private long time = 0;
 	
 	@Override
 	public Set<String> getStringRepresentationFormats() {
@@ -63,11 +63,11 @@ class TwoPluginInfo implements IContextInfo, ITwoPluginInfo {
 	{
 		if (format.equalsIgnoreCase("text/plain"))
 		{	
-				return "counter=" + getCounter();
+				return CONTEXT_TYPE + "=" + getState();
 		}
 		else if (format.equalsIgnoreCase("dynamix/web"))
 		{
-			return "counter=" + getCounter();
+			return CONTEXT_TYPE + "=" + getState();
 		}
 		else
 		{
@@ -86,22 +86,29 @@ class TwoPluginInfo implements IContextInfo, ITwoPluginInfo {
 		return CONTEXT_TYPE;
 	}
 
-	/**
-	 * Createa a BatteryLevelInfo
-	 * 
-	 * @param batteryLevel
-	 *            The device's detected battery level as a percentage of 100.
-	 */
-	public TwoPluginInfo(double counter) {
-		this.counter = counter;
+	@Override
+	public String getState()
+	{
+		return this.state;
+	}
+	
+	@Override
+	public void setState(String state)
+	{
+		this.state = state;
+	}
+	
+	public TwoPluginInfo(long time) {
+		this.time = time;
 	}
 
 	/**
 	 * Returns the device's detected battery level as a percentage of 100.
 	 */
 	@Override
-	public double getCounter() {
-		return counter;
+	public long getTime()
+	{
+		return time;
 	}
 
 	@Override
@@ -112,15 +119,19 @@ class TwoPluginInfo implements IContextInfo, ITwoPluginInfo {
 	/**
 	 * Used by Parcelable when sending (serializing) data over IPC.
 	 */
-	public void writeToParcel(Parcel out, int flags) {
-		out.writeDouble(this.counter);
+	public void writeToParcel(Parcel out, int flags)
+	{
+		out.writeLong(this.time);
+		out.writeString(this.state);
 	}
 
 	/**
 	 * Used by the Parcelable.Creator when reconstructing (deserializing) data sent over IPC.
 	 */
-	private TwoPluginInfo(final Parcel in) {
-		this.counter = in.readDouble();
+	private TwoPluginInfo(final Parcel in)
+	{
+		this.time = in.readLong();
+		this.state = in.readString();
 	}
 
 	/**

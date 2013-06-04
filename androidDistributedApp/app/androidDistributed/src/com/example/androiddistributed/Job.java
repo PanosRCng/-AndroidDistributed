@@ -4,15 +4,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import android.os.Message;
+import org.ambientdynamix.api.application.IContextInfo;
+import org.ambientdynamix.contextplugins.addplugin.IAddPluginInfo;
+import org.ambientdynamix.contextplugins.oneplugin.IOnePluginInfo;
+import org.ambientdynamix.contextplugins.twoplugin.ITwoPluginInfo;
+
+import android.os.Bundle;
 import android.util.Log;
 
 public class Job {
 	
 	private String contextType;
 	private Scheduler scheduler;
-	private String state;
+	private String jobState;
 	
 	private List<String> dependencies;
 	private Map<String, Boolean> allowedDependencies;
@@ -29,7 +35,7 @@ public class Job {
 	{
 		this.contextType = contextType;
 		this.scheduler = scheduler;
-		setState("none");		
+		setState("not_ready");		
 		dependencies = new ArrayList<String>();
 		allowedDependencies = new HashMap<String, Boolean>();
 		wakedDependencies = new HashMap<String, Boolean>();
@@ -37,112 +43,142 @@ public class Job {
 	
 	public void setState(String state)
 	{
-		this.state = state;
+		this.jobState = state;
 		scheduler.sendThreadMessage("job_state_changed:"+state);
-		
-		if(state.equals("pending_stopping"))
-		{
-			for(String dependency : dependencies )
-			{
-				try
-				{
-					scheduler.deletePlugin(dependency);
-				}
-				catch(Exception e)
-				{
-					Log.e("WTF", e.toString());
-				}
-			}
-		}
 	}
 	
-	public void getMsg(String msg)
-	{
-		if(state == "none")
-		{
-			scheduler.initPlugin(contextType);
-			setState("started");
-		}
-		else if( state == "started" )
-		{	
-			String[] parts = msg.split("=");
-
-			if(parts[1].contains("started"))
-			{
-				return;
-			}
+	public void getMsg(IContextInfo nativeInfo)
+	{			
+		if(nativeInfo instanceof IAddPluginInfo)
+	    {
+			IAddPluginInfo info = (IAddPluginInfo) nativeInfo;
+			String pluginState = info.getState();
 			
-			// get dependencies plugins
-			List<String> dependencies = new ArrayList<String>();
-			String[] depend = parts[1].split("@");
-			for(String dependency : depend)
-			{
-				if( dependency.length() > 0 )
+			if( jobState.equals("not_ready") )
+			{	
+				if(pluginState.equals("ready"))
 				{
-					dependencies.add(dependency);
-				}
-			}
-			
-			setDependencies(dependencies);
-			
-			// TODO - check if job's dependencies is Ok with sensor permissions 
-			for(String dependency : dependencies)
-			{
-				setAllowedDependency(dependency, true);
-			}
+					// get job dependencies	
+					setDependencies(info.getDependencies());
+						
+					// TODO - check if job's dependencies is Ok with sensor permissions 
+					for(String dependency : dependencies)
+					{
+						setAllowedDependency(dependency, true);
+					}
 							
-			// call dependencies plugins
-			for( String dependency : dependencies )
-			{
-				Log.i("WTF", "commiting: " + dependency);
-				scheduler.commitDependency(dependency);	
-			}
-
-			setState("pending_initialization");
-		}
-		else if( state == "running" )
-		{
-			String[] splits = msg.split("=");	  
-			String number = splits[1];	
-			Log.i("WTF", "result: " + number);
+					// call dependencies plugins
+					for( String dependency : dependencies )
+					{
+						scheduler.commitDependency(dependency);	
+					}
 			
-			scheduler.storeResult(number);
-		}
-
-	}
-	
-	public void getMsg(String srcPluginId, String msg)
-	{
-		if( state == "pending_initialization" )
-		{
-			setWakedDependency(srcPluginId, true);
+					setState("pending_initialization");
+				}
+				else if( pluginState.equals("stopped") )
+				{				
+					// get job dependencies	
+			//		setDependencies(info.getDependencies());	
+			//		startJob();
+					
+					scheduler.startPlugin(info.getContextType());
+				}
+			}
+			else if( jobState.equals("running") )
+			{		
+				if( pluginState.equals("finished") )
+				{
+					Bundle results = info.getData();		
+					
+					Set<String> keys = results.keySet();
+					Log.i("WTF", Integer.toString(keys.size()) );
+					
+					//	scheduler.storeResult(number);
+				}
+			}
+			else if( jobState.equals("stopped") )
+			{
+				if( pluginState.equals("stopped") )
+				{
+					Bundle results = info.getData();		
+					
+					Set<String> keys = results.keySet();
+					Log.i("WTF", Integer.toString(keys.size()) );
+						
+					//	scheduler.storeResult(number);
+				}
+			}
+	    }
+		else if( (nativeInfo instanceof IOnePluginInfo) )
+	    {			
+			IOnePluginInfo info = (IOnePluginInfo) nativeInfo;
+						
+			if( jobState.equals("pending_initialization") )
+			{					
+				setWakedDependency(nativeInfo.getContextType(), true);
 				
-			if( isDependenciesWaked() )
-			{
-				setState("initialized");
-					
-				scheduler.doJobPlugin(this.getContextType());
-			
-				setState("running");
+				if( isDependenciesWaked() )
+				{
+					setState("initialized");
+						
+					scheduler.doJobPlugin(this.getContextType());
+					for(String dependency : dependencies)
+					{
+						scheduler.doJobPlugin(dependency);
+					}
+				
+					setState("running");
+				}
 			}
-		}
-		else if( state == "running" )
+			else if( jobState.equals("running") )
+			{
+					double batteryLevel = info.getBatteryLevel();	
+					Bundle data = new Bundle();
+					data.putString("command", info.getContextType());
+					data.putDouble("data", batteryLevel);
+					scheduler.sendData(this.getContextType(), data);
+			}
+	    }
+		else if(nativeInfo instanceof ITwoPluginInfo)
 		{
-			if( msg.contains("counter=") )
-			{
-					String[] splits = msg.split("=");	  
-					String number = splits[1];			
-
-					Log.i("WTF", "Sending" + number);
-					
-					scheduler.sendData(srcPluginId, this.getContextType(), number);
+			ITwoPluginInfo info = (ITwoPluginInfo) nativeInfo;
+			String twoState = info.getState();
+			Log.i("twostate", twoState);
+			
+			if( jobState.equals("pending_initialization") )
+			{					
+				setWakedDependency(nativeInfo.getContextType(), true);
+				
+				if( isDependenciesWaked() )
+				{
+					setState("initialized");
+						
+					scheduler.doJobPlugin(this.getContextType());
+					for(String dependency : dependencies)
+					{
+						scheduler.doJobPlugin(dependency);
+					}
+				
+					setState("running");
+				}
 			}
+			else if( jobState.equals("running") )
+			{
+				long timeStamp = info.getTime();		
+				
+				Bundle data = new Bundle();
+				data.putString("command", info.getContextType());
+				data.putLong("data", timeStamp);
+				
+				scheduler.sendData(this.getContextType(), data);
+			}	
 		}
 	}
+
 	
 	public String getState()
 	{
-		return this.state;
+		return this.jobState;
 	}
 		
 	public String getContextType()
@@ -151,7 +187,7 @@ public class Job {
 	}
 		
 	private void setDependencies(List<String> contextTypes)
-	{
+	{		
 		String message = "!";
 		
 		for(String dependency : contextTypes)
@@ -161,11 +197,6 @@ public class Job {
 		}
 		
 		scheduler.sendThreadMessage("jobDependencies:"+message);
-	}
-	
-	public List<String> getDependencies()
-	{
-		return this.dependencies;
 	}
 	
 	public void setWakedDependency(String contextType, boolean waked)
@@ -206,6 +237,33 @@ public class Job {
 		}
 		
 		return waked;
+	}
+	
+	public void stopJob()
+	{
+		try
+		{
+			scheduler.stopPlugin(this.getContextType());
+			
+			for(String dependency : this.dependencies)
+			{
+				scheduler.stopPlugin(dependency);
+			}
+			
+			setState("stopped");
+		}
+		catch(Exception e)
+		{
+			Log.e("WTF", e.toString());
+		}
+	}
+	
+	public void startJob()
+	{
+		for(String dependency : dependencies)
+		{
+			scheduler.pingPlugin(dependency);
+		}
 	}
 	
 }

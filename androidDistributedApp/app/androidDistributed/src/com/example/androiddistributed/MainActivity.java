@@ -145,6 +145,7 @@ public class MainActivity extends TabActivity {
 			registerReceiver(tabIntentlistener, new IntentFilter("connect_dynamix"));
 			registerReceiver(tabIntentlistener, new IntentFilter("stop_job"));
 			registerReceiver(tabIntentlistener, new IntentFilter("start_job"));
+			registerReceiver(tabIntentlistener, new IntentFilter("WTF"));
 			tabIntentListenerIsRegistered = true;
 		} 
 	}	
@@ -228,7 +229,12 @@ public class MainActivity extends TabActivity {
             else if( intent.getAction().equals("start_job") )
             {
             	Log.i(TAG, "receiving intent to commit job");
-        		scheduler.commitJob("org.ambientdynamix.contextplugins.addplugin");
+            	
+        		scheduler.startCurrentJob();
+            }
+            else if( intent.getAction().equals("WTF") )
+            {
+            	Log.i(TAG, "get The WTF intent");
             }
         }
     }    

@@ -10,6 +10,10 @@ public interface ITwoPluginInfo {
 	public abstract String getContextType();
 
 	public abstract Set<String> getStringRepresentationFormats();
+	
+	public abstract String getState();
 
-	public abstract double getCounter();
+	public abstract void setState(String state);
+	
+	public abstract long getTime();
 }

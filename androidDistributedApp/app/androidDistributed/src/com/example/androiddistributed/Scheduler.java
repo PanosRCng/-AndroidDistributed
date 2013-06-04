@@ -8,6 +8,7 @@ import java.util.Stack;
 import org.ambientdynamix.api.application.ContextEvent;
 import org.ambientdynamix.api.application.ContextPluginInformation;
 import org.ambientdynamix.api.application.ContextSupportInfo;
+import org.ambientdynamix.api.application.IContextInfo;
 
 import org.ambientdynamix.api.application.IDynamixFacade;
 import org.ambientdynamix.api.application.IDynamixListener;
@@ -181,18 +182,11 @@ public class Scheduler extends Thread implements Runnable {
 
 		@Override
 		public void onContextEvent(ContextEvent event) throws RemoteException
-		{			  
-			String representation = event.getStringRepresentation("text/plain");
-			ContextPluginInformation cpInfo = event.getEventSource();
-			String srcPluginId = cpInfo.getPluginId();
-			
-			if( srcPluginId.equals( currentJob.getContextType() ) )
-			{		
-				currentJob.getMsg(representation);
-			}
-			else
-			{	
-				currentJob.getMsg(srcPluginId, representation);		
+		{			  				
+			if (event.hasIContextInfo())
+			{				
+			      IContextInfo nativeInfo = event.getIContextInfo();
+			      currentJob.getMsg(nativeInfo);
 			}
 		}
 		
@@ -240,35 +234,16 @@ public class Scheduler extends Thread implements Runnable {
 			Log.i(TAG,
 					"A1 - onContextSupportAdded for " + supportInfo.getContextType() + " using plugin "
 							+ supportInfo.getPlugin() + " | id was: " + supportInfo.getSupportId());
-			
-			free_to_commit = true;
-			
-			if( currentJob.getState() == "none" )
-			{
-				startPlugin( currentJob.getContextType() );
-			}
+						
+			pingPlugin( supportInfo.getContextType() );
 
+			free_to_commit = true;
 			startJob();	
 		}
 
 		@Override
 		public void onContextSupportRemoved(ContextSupportInfo supportInfo) throws RemoteException {
 			Log.i(TAG, "A1 - onContextSupportRemoved for " + supportInfo.getSupportId());
-			
-			if( supportInfo.getContextType().equals(currentJob.getContextType()) )
-			{
-				currentJob.setState("pending_stopping");
-			}
-			
-			if( currentJob.getState().equals("pending_stopping") )
-			{
-				currentJob.setWakedDependency(supportInfo.getContextType(), false);	
-				
-				if(!currentJob.isDependenciesWaked())
-				{
-					currentJob.setState("stopped");
-				}
-			}
 		}
 
 		@Override
@@ -303,6 +278,8 @@ public class Scheduler extends Thread implements Runnable {
 		@Override
 		public void onContextPluginInstallFailed(ContextPluginInformation plug, String message) throws RemoteException {
 			Log.i(TAG, "A1 - onContextPluginInstallFailed for " + plug + " with message: " + message);
+			
+			
 		}
 
 		@Override
@@ -464,16 +441,11 @@ public class Scheduler extends Thread implements Runnable {
 	}
 	
 	// pass data to experiment plugin from a dependency plugin
-	public void sendData(String srcPluginId, String dstPluginId, String data)
-	{		
-		// set start Bundle
-		Bundle send = new Bundle();
-		send.putString("command", srcPluginId);
-		send.putString("data", data);
-		
+	public void sendData(String dstPluginId, Bundle data)
+	{				
 		try
 		{
-			sendConfiguredRequest(dstPluginId, send);
+			sendConfiguredRequest(dstPluginId, data);
 		}
 		catch (Exception e)
 		{
@@ -482,7 +454,7 @@ public class Scheduler extends Thread implements Runnable {
 	}
 	
 	// stop plugin with ContextType contextType
-	private void stopPlugin(String pluginId)
+	public void stopPlugin(String pluginId)
 	{
 		// set stop Bundle
 		Bundle stop = new Bundle();
@@ -496,22 +468,10 @@ public class Scheduler extends Thread implements Runnable {
 		{
 			Log.w(TAG, e.toString());
 		}
-			
-/*		try
-		{
-			dynamix.stopPlugin(pluginId);
-			
-			Log.i(TAG, "trying stop plugin with pluginId: " + pluginId );
-		}
-		catch(Exception e)
-		{
-			Log.i(TAG, e.toString());
-		}
-*/
 	}
 	
 	// start plugin with ContextType contextType
-	private void startPlugin(String contextType)
+	public void startPlugin(String contextType)
 	{		
 		// set start Bundle
 		Bundle start = new Bundle();
@@ -526,17 +486,17 @@ public class Scheduler extends Thread implements Runnable {
 			Log.w(TAG, e.toString());
 		}
 	}
-	
-	// init plugin with ContextType contextType
-	public void initPlugin(String contextType)
+		
+	// start plugin with ContextType contextType
+	public void pingPlugin(String contextType)
 	{		
 		// set start Bundle
-		Bundle init = new Bundle();
-		init.putString("command", "init");
+		Bundle ping = new Bundle();
+		ping.putString("command", "ping");
 		
 		try
 		{
-			sendConfiguredRequest(contextType, init);
+			sendConfiguredRequest(contextType, ping);
 		}
 		catch (Exception e)
 		{
@@ -610,23 +570,9 @@ public class Scheduler extends Thread implements Runnable {
 		{
 			Log.e(TAG, e.toString());
 		}
-		
-		if(resultCounter > 5)
-		{			
-			String jobId = currentJob.getContextType();
-			
-			try
-			{
-				deletePlugin(currentJob.getContextType());
-				currentJob = null;
-			}
-			catch (RemoteException e)
-			{
-				e.printStackTrace();
-			}
-			
-			reporter.report(jobId);	
-		}
+				
+		String jobId = currentJob.getContextType();
+		reporter.report(jobId);	
 	}
 	
 	public void sendThreadMessage(String message)
@@ -638,9 +584,17 @@ public class Scheduler extends Thread implements Runnable {
 	
 	public void stopCurrentPlugin()
 	{				
+		currentJob.stopJob();
+	}
+	
+	public void startCurrentJob()
+	{
+		currentJob.setState("not_ready");
+//		startPlugin(currentJob.getContextType());
+		
 		try
 		{
-			deletePlugin(currentJob.getContextType());
+			summonPlugin(currentJob.getContextType());
 		}
 		catch(Exception e)
 		{

@@ -26,7 +26,7 @@ public class jobsTab extends Activity {
         setContentView(R.layout.jobs);
         
         jobImgv = (ImageView) findViewById(R.id.imageView1);
-		jobImgv.setImageResource(R.drawable.job_none);
+		jobImgv.setImageResource(R.drawable.jobs_selected);
         dependenciesListView = (ListView) findViewById( R.id.dependenciesLV );
         dependencies = new ArrayList<String>();
         
@@ -61,7 +61,11 @@ public class jobsTab extends Activity {
     
 	public void setJobState(String state)
 	{
-		if( (state.equals("started")) || (state.equals("pending_initialization")) )
+		if( state.equals("ready"))
+		{
+			jobImgv.setImageResource(R.drawable.job_ready);
+		}
+		else if(state.equals("pending_initialization"))
 		{
 			jobImgv.setImageResource(R.drawable.job_wait);
 		}

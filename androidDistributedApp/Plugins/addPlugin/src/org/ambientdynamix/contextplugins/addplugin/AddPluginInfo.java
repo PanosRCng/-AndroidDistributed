@@ -15,21 +15,27 @@
  */
 package org.ambientdynamix.contextplugins.addplugin;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.ambientdynamix.api.application.IContextInfo;
 
+import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
-class AddPluginInfo implements IContextInfo, IAddPluginInfo {
+class AddPluginInfo implements IContextInfo, IAddPluginInfo
+{
 	/**
 	 * Required CREATOR field that generates instances of this Parcelable class from a Parcel.
 	 * 
 	 * @see http://developer.android.com/reference/android/os/Parcelable.Creator.html
 	 */
-	public static Parcelable.Creator<AddPluginInfo> CREATOR = new Parcelable.Creator<AddPluginInfo>() {
+	public static Parcelable.Creator<AddPluginInfo> CREATOR = new Parcelable.Creator<AddPluginInfo>()
+	{
 		/**
 		 * Create a new instance of the Parcelable class, instantiating it from the given Parcel whose data had
 		 * previously been written by Parcelable.writeToParcel().
@@ -45,13 +51,28 @@ class AddPluginInfo implements IContextInfo, IAddPluginInfo {
 			return new AddPluginInfo[size];
 		}
 	};
-	// Public static variable for our supported context type
-	public static String CONTEXT_TYPE = "org.ambientdynamix.contextplugins.addplugin";
 	
-	private String message = "";
+	
+	/*
+	 *	plugin information - contextType - dependencies - state - data
+	 */
+	
+	public static String CONTEXT_TYPE = "org.ambientdynamix.contextplugins.addplugin";
+	private String state = "started";
+	private Bundle data;
+	
+	ArrayList<String> dependencies = new ArrayList<String>()
+	{
+		{
+			add("org.ambientdynamix.contextplugins.oneplugin");
+			add("org.ambientdynamix.contextplugins.twoplugin");
+		}
+	};
+	
 	
 	@Override
-	public Set<String> getStringRepresentationFormats() {
+	public Set<String> getStringRepresentationFormats()
+	{
 		Set<String> formats = new HashSet<String>();
 		formats.add("text/plain");
 		formats.add("dynamix/web");
@@ -63,11 +84,11 @@ class AddPluginInfo implements IContextInfo, IAddPluginInfo {
 	{
 		if (format.equalsIgnoreCase("text/plain"))
 		{	
-				return CONTEXT_TYPE + "=" + getMessage();
+				return CONTEXT_TYPE + "=" + getState();
 		}
 		else if (format.equalsIgnoreCase("dynamix/web"))
 		{
-			return CONTEXT_TYPE + "=" + getMessage();
+			return CONTEXT_TYPE + "=" + getState();
 		}
 		else
 		{
@@ -86,24 +107,35 @@ class AddPluginInfo implements IContextInfo, IAddPluginInfo {
 		return CONTEXT_TYPE;
 	}
 
-	/**
-	 * Createa a BatteryLevelInfo
-	 * 
-	 * @param batteryLevel
-	 *            The device's detected battery level as a percentage of 100.
-	 */
-	public AddPluginInfo(String message) {
-		this.message = message;
-	}
 
-	/**
-	 * Returns the device's detected battery level as a percentage of 100.
-	 */
+	public AddPluginInfo(String state)
+	{
+		this.state = state;
+	}
+	
 	@Override
-	public String getMessage() {
-		return message;
+	public String getState() {
+		return state;
 	}
 
+	@Override
+	public Bundle getData()
+	{
+		return this.data;
+	}
+	
+	@Override
+	public void setData(Bundle data)
+	{
+		this.data = data;
+	}
+	
+	@Override
+	public List<String> getDependencies()
+	{
+		return dependencies;
+	}
+	
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName();
@@ -113,21 +145,16 @@ class AddPluginInfo implements IContextInfo, IAddPluginInfo {
 	 * Used by Parcelable when sending (serializing) data over IPC.
 	 */
 	public void writeToParcel(Parcel out, int flags) {
-		out.writeString(this.message);
+		out.writeString(this.state);
+		out.writeBundle(this.data);
 	}
 
-	/**
-	 * Used by the Parcelable.Creator when reconstructing (deserializing) data sent over IPC.
-	 */
+
 	private AddPluginInfo(final Parcel in) {
-		this.message = in.readString();
+		this.state = in.readString();
+		this.data = in.readBundle();
 	}
 
-	/**
-	 * Default implementation that returns 0.
-	 * 
-	 * @return 0
-	 */
 	@Override
 	public int describeContents() {
 		return 0;
