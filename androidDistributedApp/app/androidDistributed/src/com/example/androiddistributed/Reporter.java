@@ -1,11 +1,12 @@
 package com.example.androiddistributed;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.File;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 public class Reporter extends Thread implements Runnable {
@@ -32,17 +33,21 @@ public class Reporter extends Thread implements Runnable {
 		{
 			e.printStackTrace();
 		}
+		
+		File dir = context.getFilesDir();		
+		File[] files = dir.listFiles();
+		for(File file : files)
+		{
+				Log.i("WTF", file.getName());
+		}
+		
 	}
 	
 	public void report(String jobId)
 	{
 		Log.i(TAG, "reporter report job with job_id: " + jobId);
-		
-		String data = readResults(jobId+"_store");
-		
-		Log.i(TAG, "results from job: " + data);
 	}
-	
+/*	
 	public String readResults(String filename)
 	{		
 		String data="";
@@ -67,5 +72,13 @@ public class Reporter extends Thread implements Runnable {
 	    }
 	    
 	    return data;
+	}
+*/	
+	
+	public void sendThreadMessage(String message)
+	{
+		Message msg = new Message();
+		msg.obj = message;
+		handler.sendMessage(msg);
 	}
 }

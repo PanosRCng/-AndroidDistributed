@@ -38,9 +38,26 @@
             android:name=".jobsTab" >
         </activity> 
         
+        <activity
+            android:label="reportTab"
+            android:name=".reportTab" >
+        </activity> 
+        
+        <activity
+            android:label="securityTab"
+            android:name=".securityTab" >
+        </activity> 
+        		   
+		<service android:name="com.example.androiddistributed.MainService">
+    		<intent-filter>
+        		<action android:name="com.example.androiddistributed.MainService"/>
+    		</intent-filter>
+    	</service>         		   
+        		        
     </application>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" /> 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 </manifest>

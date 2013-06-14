@@ -61,10 +61,12 @@ public class Job {
 					// get job dependencies	
 					setDependencies(info.getDependencies());
 						
-					// TODO - check if job's dependencies is Ok with sensor permissions 
 					for(String dependency : dependencies)
 					{
-						setAllowedDependency(dependency, true);
+					//	if( scheduler.sensorsPermissions.get(dependency) )
+					//	{
+							setAllowedDependency(dependency, true);
+					//	}
 					}
 							
 					// call dependencies plugins
@@ -77,10 +79,6 @@ public class Job {
 				}
 				else if( pluginState.equals("stopped") )
 				{				
-					// get job dependencies	
-			//		setDependencies(info.getDependencies());	
-			//		startJob();
-					
 					scheduler.startPlugin(info.getContextType());
 				}
 			}
@@ -88,12 +86,11 @@ public class Job {
 			{		
 				if( pluginState.equals("finished") )
 				{
+					setState("finished");
+					
 					Bundle results = info.getData();		
-					
-					Set<String> keys = results.keySet();
-					Log.i("WTF", Integer.toString(keys.size()) );
-					
-					//	scheduler.storeResult(number);
+					scheduler.storeJobResults(results);
+					scheduler.reportJob(this.getContextType());
 				}
 			}
 			else if( jobState.equals("stopped") )
@@ -101,11 +98,7 @@ public class Job {
 				if( pluginState.equals("stopped") )
 				{
 					Bundle results = info.getData();		
-					
-					Set<String> keys = results.keySet();
-					Log.i("WTF", Integer.toString(keys.size()) );
-						
-					//	scheduler.storeResult(number);
+					scheduler.storeJobResults(results);
 				}
 			}
 	    }

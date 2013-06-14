@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:background="#000000" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_margin="5dp"
+            android:src="@drawable/report" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+            
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0.02"
+                android:text="time reported"
+                android:textColor="#36ACF5"
+                android:textSize="15dp" />
+            
+             <TextView
+                 android:id="@+id/textView2"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="left"
+                 android:layout_marginLeft="20dp"
+                 android:layout_weight="0.02"
+                 android:text="expires"
+                 android:textColor="#36ACF5"
+                 android:textSize="12dp" />
+            
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

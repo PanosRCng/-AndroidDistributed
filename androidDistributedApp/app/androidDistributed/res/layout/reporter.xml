@@ -1,14 +1,131 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:orientation="vertical" >
-        
-    <TextView
-            android:id="@+id/textView1"
+        android:orientation="vertical"
+        android:background="#000000" >
+
+   <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0.02"
+                android:text="Connection status: "
+                android:textColor="#36ACF5"
+                android:textSize="15dp" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_margin="5dp"
+                android:src="@drawable/database_disconnected" />
+
+    </LinearLayout>
+
+           <View
             android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#7F7E85" />
+   
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:orientation="vertical" >
+
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content" >
+
+           <ImageView
+               android:id="@+id/imageView1"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_margin="20dp"
+               android:src="@drawable/no_job_report" />
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:orientation="vertical" >
+
+               <TextView
+                   android:id="@+id/TextView05"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginLeft="20dp"
+                   android:layout_weight="0.02"
+                   android:text="Job name"
+                   android:textColor="#36ACF5"
+                   android:textSize="15dp" />
+
+              <TextView
+                   android:id="@+id/TextView06"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginLeft="20dp"
+                   android:layout_weight="0.02"
+                   android:text="date reported"
+                   android:textColor="#36ACF5"
+                   android:textSize="12dp" />
+               
+               <TextView
+                   android:id="@+id/TextView07"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginLeft="20dp"
+                   android:layout_weight="0.02"
+                   android:text="Report Size"
+                   android:textColor="#36ACF5"
+                   android:textSize="12dp" />
+
+               <TextView
+                   android:id="@+id/TextView08"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginLeft="20dp"
+                   android:layout_weight="0.02"
+                   android:text="expires"
+                   android:textColor="#36ACF5"
+                   android:textSize="12dp" />
+
+           </LinearLayout>      
+                      
+       </LinearLayout>
+
+   </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#7F7E85" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="This is reporter activity"
-            android:textAppearance="?android:attr/textAppearanceLarge" />
+            android:layout_gravity="center"
+            android:text="Jobs to Report "
+            android:textColor="#36ACF5"
+            android:textSize="15dp" />
+        
+        <ListView
+        	android:id="@+id/reportsLV"
+        	android:layout_width="wrap_content"
+        	android:layout_height="299dp"
+        	android:layout_weight="0.77" >
+    	</ListView>        
+        
+    </LinearLayout>
     	
  </LinearLayout>

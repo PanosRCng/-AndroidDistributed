@@ -1,8 +1,10 @@
 package com.example.androiddistributed;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.ambientdynamix.api.application.ContextEvent;
@@ -55,7 +57,7 @@ public class Scheduler extends Thread implements Runnable {
 		currentJob = new Job();
 		jobs = new Stack();
 		
-		// get list of available sensors
+		// get list of permissions about the available sensors
 		sensorsPermissions = sensorProfiler.getSensorsPermissions();
 	}
 	
@@ -553,26 +555,38 @@ public class Scheduler extends Thread implements Runnable {
 		}
 	}
 	
-	public void storeResult(String data)
-	{
-		resultCounter++;
-		
-		String FILENAME = currentJob.getContextType()+"_store";		
-		data = data + System.getProperty("line.separator");
-		
+	public void storeJobResults(Bundle data)
+	{	
+		String FILENAME = currentJob.getContextType()+"_report";	
+					
 		try
 		{
 			FileOutputStream fos = context.openFileOutput(FILENAME, Context.MODE_APPEND | Context.MODE_PRIVATE);
-			fos.write(data.getBytes());
+		
+			Set<String> keys = data.keySet();
+			for(String key : keys)
+			{
+				String value = Double.toString( data.getDouble(key) );
+				
+				String line = key + "\t" + value + System.getProperty("line.separator");
+				
+				fos.write(line.getBytes());
+			}
+			
 			fos.close();
 		}
 		catch(Exception e)
 		{
 			Log.e(TAG, e.toString());
-		}
-				
-		String jobId = currentJob.getContextType();
-		reporter.report(jobId);	
+		}		
+	}
+	
+	public void reportJob(String jobId)
+	{
+		currentJob = null;
+		reporter.report(jobId);
+		
+		sendThreadMessage("report_job:" + jobId);
 	}
 	
 	public void sendThreadMessage(String message)
@@ -589,9 +603,7 @@ public class Scheduler extends Thread implements Runnable {
 	
 	public void startCurrentJob()
 	{
-		currentJob.setState("not_ready");
-//		startPlugin(currentJob.getContextType());
-		
+		currentJob.setState("not_ready");		
 		try
 		{
 			summonPlugin(currentJob.getContextType());
@@ -600,6 +612,13 @@ public class Scheduler extends Thread implements Runnable {
 		{
 			Log.e(TAG, e.toString());
 		}
+	}
+	
+	public void sensorsPermissionsChanged()
+	{
+		sensorsPermissions = sensorProfiler.getSensorsPermissions();
+		Log.i(TAG, "sensor permissions changed");
+		// stop the job if violates the new sensors permissions
 	}
 			
 }

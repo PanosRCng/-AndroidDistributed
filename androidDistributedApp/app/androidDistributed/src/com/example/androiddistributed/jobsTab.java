@@ -19,6 +19,7 @@ public class jobsTab extends Activity {
 	private ListView dependenciesListView ;
 	private ArrayAdapter<String> listAdapter ;
     ArrayList<String> dependencies;
+    private String jobState;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,9 +27,11 @@ public class jobsTab extends Activity {
         setContentView(R.layout.jobs);
         
         jobImgv = (ImageView) findViewById(R.id.imageView1);
-		jobImgv.setImageResource(R.drawable.jobs_selected);
+		jobImgv.setImageResource(R.drawable.jobs_unselected);
         dependenciesListView = (ListView) findViewById( R.id.dependenciesLV );
         dependencies = new ArrayList<String>();
+        
+        jobState = "none";
         
         tabActive = true;
     }
@@ -63,24 +66,35 @@ public class jobsTab extends Activity {
 	{
 		if( state.equals("ready"))
 		{
+			jobState = "ready";
 			jobImgv.setImageResource(R.drawable.job_ready);
 		}
 		else if(state.equals("pending_initialization"))
 		{
+			jobState = "pending_initialization";
 			jobImgv.setImageResource(R.drawable.job_wait);
 		}
 		else if(state.equals("initialized"))
 		{
+			jobState = "initialized";
 			jobImgv.setImageResource(R.drawable.job_initialized);
 		}
 		else if( state.equals("running") )
 		{
+			jobState = "running";
 			jobImgv.setImageResource(R.drawable.job_running);
 		}
 		else if( state.equals("stopped") )
 		{
+			jobState = "stopped";
 			jobImgv.setImageResource(R.drawable.job_stoped);
-			
+			dependencies.clear();
+			refreshDependenciesListView();
+		}
+		else if( state.equals("finished") )
+		{
+			jobState = "none";
+			jobImgv.setImageResource(R.drawable.jobs_unselected);
 			dependencies.clear();
 			refreshDependenciesListView();
 		}
@@ -88,11 +102,19 @@ public class jobsTab extends Activity {
 	
     public void startJob(View view)
     {  
+    	if(jobState.equals("none"))
+    	{
+    		return;
+    	}
     	sendStartJobIntent();
     } 
     
     public void stopJob(View view)
     {
+    	if(jobState.equals("none"))
+    	{
+    		return;
+    	}
     	sendStopJobIntent();
     }
 	

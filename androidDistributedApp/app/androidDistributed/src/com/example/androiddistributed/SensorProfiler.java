@@ -5,9 +5,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -19,9 +26,18 @@ public class SensorProfiler extends Thread implements Runnable {
 	// get TAG name for reporting to LogCat
 	private final String TAG = this.getClass().getSimpleName();
 
+	private boolean batteryEnabled;
+	private boolean gpsEnabled;
+	private boolean wifiEnabled;
+	private SharedPreferences pref;
+	private Editor editor;
+	
 	private List<String> sensors;
 	private List<String> permissions;
 	private Map<String,Boolean> sensorsPermissions=new HashMap<String, Boolean>();
+	private Map<String,String> sensorsContextTypes=new HashMap<String, String>();
+	
+	private  NetworkStateReceiver mReceiver;
 	
 	Context context;
 	
@@ -30,8 +46,26 @@ public class SensorProfiler extends Thread implements Runnable {
 		this.handler = handler;
 		this.context = context;
 		
+        pref = context.getApplicationContext().getSharedPreferences("sensors", 0); // 0 - for private mode
+        editor = pref.edit();
+		
+        mReceiver = new NetworkStateReceiver();
+        
 		sensors= new ArrayList<String>();
+		//
+		// getAvailableSensors();
+		sensors.add("battery");
+		sensors.add("wifi");
+		sensors.add("gps");
+		//
+		
+		// map sensors to contextTypes
+		sensorsContextTypes.put("battery", "org.ambientdynamix.contextplugins.oneplugin");
+		
+		// get sensor permissions
 		permissions = new ArrayList<String>();
+		getPermissions();
+		setPermissions();
 	}
 	
 	public void run()
@@ -41,6 +75,23 @@ public class SensorProfiler extends Thread implements Runnable {
 			Log.d(TAG, "running");
 			Thread.sleep(1000); //This could be something computationally intensive.
 
+			//IntentFilter intentFilter = new IntentFilter();
+	        //context.registerReceiver(mReceiver, intentFilter);
+			
+	        // register network status receiver
+	        IntentFilter filter = new IntentFilter();
+	        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+	        context.registerReceiver(mReceiver, filter);
+			
+			if( isNetworkAvailable() )
+			{
+				sendThreadMessage("internet_status:internet_ok");
+			}
+			else
+			{
+				sendThreadMessage("internet_status:no_internet");
+			}
+			
 			// get available sensors on this android device
 		    getAvailableSensors(context);
 		    
@@ -56,10 +107,18 @@ public class SensorProfiler extends Thread implements Runnable {
 		}
 	}
 	
-
+	// network changed receiver
+	public class NetworkStateReceiver extends BroadcastReceiver
+	{
+	    public void onReceive(Context context, Intent intent)
+	    {
+	    	networkStatusChanged();
+	    }
+	}
+	    
 	// make the sensors permissions available to other modules
 	public Map<String, Boolean> getSensorsPermissions()
-	{
+	{		
 		return sensorsPermissions;
 	}
 	
@@ -70,11 +129,11 @@ public class SensorProfiler extends Thread implements Runnable {
 		{
 			if(permissions.contains(sensor))
 			{
-				sensorsPermissions.put(sensor, true);
+				sensorsPermissions.put( sensorsContextTypes.get(sensor) , true);
 			}
 			else
 			{
-				sensorsPermissions.put(sensor, false);
+				sensorsPermissions.put( sensorsContextTypes.get(sensor) , false);
 			}
 		}
 	}
@@ -82,8 +141,37 @@ public class SensorProfiler extends Thread implements Runnable {
 	// get user permissions about the sensors
 	private void getPermissions()
 	{		
-		permissions.add("accelerometer");
-		permissions.add("orientation");
+		editor.commit();
+    	
+	    // run first time after installation - or data clean
+	    if( !(pref.contains("firstTime")) )
+	    {
+	    	editor.putBoolean("firstTime", false);
+	    	editor.putBoolean("battery", false);
+	    	editor.putBoolean("gps", false);
+	    	editor.putBoolean("wifi", false);
+	           	
+	        editor.commit();
+	    }
+
+	    batteryEnabled = pref.getBoolean("battery", false);
+	    gpsEnabled = pref.getBoolean("gps", false);
+	    wifiEnabled = pref.getBoolean("wifi", false);
+	   	
+	    if( batteryEnabled )
+	    {
+	    	permissions.add("battery");
+	    }
+	   	
+	    if( gpsEnabled )
+	    {
+	    	permissions.add("gps");
+	    }
+	    	
+	    if( wifiEnabled )
+	    {
+	    	permissions.add("wifi");
+	    }				
 	}
 	
 	// get list of the available sensor types
@@ -116,10 +204,30 @@ public class SensorProfiler extends Thread implements Runnable {
 	    return listSensorType;
 	}
 	
-	private void sensorsPresmissionsChanged()
+	// checks if there is a network interface - call and a service to make sure it goes to the internet 
+	private boolean isNetworkAvailable()
 	{
-        Message message = handler.obtainMessage();
-        message.obj = Double.toString(Math.random());
-        handler.sendMessage(message);
+	    ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
+	
+	private void networkStatusChanged()
+	{
+		if( isNetworkAvailable() )
+		{
+			sendThreadMessage("internet_status:internet_ok");
+		}
+		else
+		{
+			sendThreadMessage("internet_status:no_internet");
+		}
+	}
+	
+	public void sendThreadMessage(String message)
+	{
+		Message msg = new Message();
+		msg.obj = message;
+		handler.sendMessage(msg);
 	}
 }
