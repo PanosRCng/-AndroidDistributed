@@ -22,14 +22,12 @@ public class AddPluginRuntime extends AutoReactiveContextPluginRuntime {
 	// Our secure context
 	private Context context;
 	private List<String> dependencies;	
-	private String dependency1 = "org.ambientdynamix.contextplugins.oneplugin";
-	private String dependency2 = "org.ambientdynamix.contextplugins.twoplugin";
+	private String dependency1 = "org.ambientdynamix.contextplugins.batteryTemperaturePlugin";
 	
 	private int samples = 10;
 	private int sample_counter = 0;
 	
-	private double batteryLevel = 0.0;
-	private long time = 0;
+	private int batteryLevel = 0;
 	private Bundle results;
 	
 	private String state;
@@ -91,11 +89,7 @@ public class AddPluginRuntime extends AutoReactiveContextPluginRuntime {
 		}
 		else if( command.equals(dependency1) )
 		{
-			batteryLevel = (Double) config.getDouble("data");
-		}
-		else if( command.equals(dependency2) )
-		{
-			time = (Long) config.getLong("data");
+			batteryLevel = Integer.parseInt(config.getString("data"));
 		}
 		else if( command.equals("start") )
 		{
@@ -165,13 +159,11 @@ public class AddPluginRuntime extends AutoReactiveContextPluginRuntime {
 	{
 		Log.i(TAG, "doing happy job");
 				
-		long currentTime = System.currentTimeMillis();
-		long latency = currentTime - this.time;
-				
-		results.putDouble(Long.toString(latency), this.batteryLevel);
+		long currentTime = System.currentTimeMillis();			
+		results.putString(Long.toString(currentTime), Integer.toString(this.batteryLevel));
 		
 		sample_counter++;
-		if(sample_counter > samples)
+		if(sample_counter >= samples)
 		{
 			running = false;
 			setState("finished");			

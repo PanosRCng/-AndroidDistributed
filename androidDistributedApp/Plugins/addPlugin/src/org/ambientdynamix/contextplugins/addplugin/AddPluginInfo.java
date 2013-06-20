@@ -64,8 +64,7 @@ class AddPluginInfo implements IContextInfo, IAddPluginInfo
 	ArrayList<String> dependencies = new ArrayList<String>()
 	{
 		{
-			add("org.ambientdynamix.contextplugins.oneplugin");
-			add("org.ambientdynamix.contextplugins.twoplugin");
+			add("org.ambientdynamix.contextplugins.batteryTemperaturePlugin");
 		}
 	};
 	
