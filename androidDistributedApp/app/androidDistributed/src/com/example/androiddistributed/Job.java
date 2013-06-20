@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.ambientdynamix.api.application.IContextInfo;
 import org.ambientdynamix.contextplugins.addplugin.IAddPluginInfo;
+import org.ambientdynamix.contextplugins.batteryLevelPlugin.IBatteryLevelPluginInfo;
+import org.ambientdynamix.contextplugins.batteryTemperaturePlugin.IBatteryTemperaturePluginInfo;
 import org.ambientdynamix.contextplugins.oneplugin.IOnePluginInfo;
-import org.ambientdynamix.contextplugins.twoplugin.ITwoPluginInfo;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -47,49 +47,55 @@ public class Job {
 		scheduler.sendThreadMessage("job_state_changed:"+state);
 	}
 	
+
 	public void getMsg(IContextInfo nativeInfo)
-	{			
+	{	
 		if(nativeInfo instanceof IAddPluginInfo)
-	    {
+		{
 			IAddPluginInfo info = (IAddPluginInfo) nativeInfo;
 			String pluginState = info.getState();
-			
+
 			if( jobState.equals("not_ready") )
 			{	
 				if(pluginState.equals("ready"))
 				{
-					// get job dependencies	
+					// get job dependencies
 					setDependencies(info.getDependencies());
-						
+
 					for(String dependency : dependencies)
 					{
-					//	if( scheduler.sensorsPermissions.get(dependency) )
-					//	{
+						
+						if( scheduler.sensorsPermissions.get(dependency) )
+						{							
 							setAllowedDependency(dependency, true);
-					//	}
+						}
+						else
+						{
+							setAllowedDependency(dependency, false);
+						}
 					}
-							
+
 					// call dependencies plugins
 					for( String dependency : dependencies )
 					{
 						scheduler.commitDependency(dependency);	
 					}
-			
+
 					setState("pending_initialization");
 				}
 				else if( pluginState.equals("stopped") )
-				{				
+				{	
 					scheduler.startPlugin(info.getContextType());
 				}
 			}
 			else if( jobState.equals("running") )
-			{		
+			{	
 				if( pluginState.equals("finished") )
 				{
 					setState("finished");
-					
-					Bundle results = info.getData();		
-					scheduler.storeJobResults(results);
+
+					Bundle results = info.getData();	
+					scheduler.storeJobResults(results);					
 					scheduler.reportJob(this.getContextType());
 				}
 			}
@@ -97,71 +103,101 @@ public class Job {
 			{
 				if( pluginState.equals("stopped") )
 				{
-					Bundle results = info.getData();		
+					Bundle results = info.getData();	
 					scheduler.storeJobResults(results);
 				}
 			}
-	    }
+		}
 		else if( (nativeInfo instanceof IOnePluginInfo) )
-	    {			
+		{	
 			IOnePluginInfo info = (IOnePluginInfo) nativeInfo;
-						
+
 			if( jobState.equals("pending_initialization") )
-			{					
+			{	
 				setWakedDependency(nativeInfo.getContextType(), true);
-				
-				if( isDependenciesWaked() )
+
+				if( isDependenciesWaked() && isDependenciesAllowed() )
 				{
 					setState("initialized");
-						
+
 					scheduler.doJobPlugin(this.getContextType());
 					for(String dependency : dependencies)
 					{
 						scheduler.doJobPlugin(dependency);
 					}
-				
+
 					setState("running");
 				}
 			}
 			else if( jobState.equals("running") )
 			{
-					double batteryLevel = info.getBatteryLevel();	
-					Bundle data = new Bundle();
-					data.putString("command", info.getContextType());
-					data.putDouble("data", batteryLevel);
-					scheduler.sendData(this.getContextType(), data);
+				double batteryLevel = info.getBatteryLevel();	
+				Bundle data = new Bundle();
+				data.putString("command", info.getContextType());
+				data.putDouble("data", batteryLevel);
+				scheduler.sendData(this.getContextType(), data);
 			}
-	    }
-		else if(nativeInfo instanceof ITwoPluginInfo)
+		}
+		else if(nativeInfo instanceof IBatteryLevelPluginInfo)
 		{
-			ITwoPluginInfo info = (ITwoPluginInfo) nativeInfo;
-			String twoState = info.getState();
-			Log.i("twostate", twoState);
-			
+			IBatteryLevelPluginInfo info = (IBatteryLevelPluginInfo) nativeInfo;
+
 			if( jobState.equals("pending_initialization") )
-			{					
+			{	
 				setWakedDependency(nativeInfo.getContextType(), true);
-				
-				if( isDependenciesWaked() )
+
+				if( isDependenciesWaked() && isDependenciesAllowed() )
 				{
 					setState("initialized");
-						
+
 					scheduler.doJobPlugin(this.getContextType());
 					for(String dependency : dependencies)
 					{
 						scheduler.doJobPlugin(dependency);
 					}
-				
+
 					setState("running");
 				}
 			}
 			else if( jobState.equals("running") )
-			{
-				long timeStamp = info.getTime();		
+			{				
+				int batteryLevel = info.getBatteryLevel();	
 				
 				Bundle data = new Bundle();
 				data.putString("command", info.getContextType());
-				data.putLong("data", timeStamp);
+				data.putString("data", Integer.toString(batteryLevel));
+				
+				scheduler.sendData(this.getContextType(), data);
+			}	
+		}
+		else if(nativeInfo instanceof IBatteryTemperaturePluginInfo)
+		{
+			IBatteryTemperaturePluginInfo info = (IBatteryTemperaturePluginInfo) nativeInfo;
+
+			if( jobState.equals("pending_initialization") )
+			{	
+				setWakedDependency(nativeInfo.getContextType(), true);
+
+				if( isDependenciesWaked() && isDependenciesAllowed() )
+				{
+					setState("initialized");
+
+					scheduler.doJobPlugin(this.getContextType());
+					for(String dependency : dependencies)
+					{
+						scheduler.doJobPlugin(dependency);
+					}
+
+					setState("running");
+				}
+			}
+			else if( jobState.equals("running") )
+			{				
+				int batteryTemperature = info.getTemperature();	
+				
+				Bundle data = new Bundle();
+				data.putString("command", info.getContextType());
+				data.putString("data", Integer.toString(batteryTemperature));
 				
 				scheduler.sendData(this.getContextType(), data);
 			}	
@@ -204,7 +240,7 @@ public class Job {
 	
 	private boolean isDependenciesAllowed()
 	{
-		boolean allowed = false;
+		boolean allowed = true;
 		
 		for(String dependency : dependencies)
 		{
@@ -236,13 +272,13 @@ public class Job {
 	{
 		try
 		{
-			scheduler.stopPlugin(this.getContextType());
-			
 			for(String dependency : this.dependencies)
 			{
 				scheduler.stopPlugin(dependency);
 			}
 			
+			scheduler.stopPlugin(this.getContextType());
+						
 			setState("stopped");
 		}
 		catch(Exception e)

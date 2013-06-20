@@ -15,6 +15,14 @@ import org.ambientdynamix.api.application.IContextInfo;
 import org.ambientdynamix.api.application.IDynamixFacade;
 import org.ambientdynamix.api.application.IDynamixListener;
 import org.ambientdynamix.api.application.Result;
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
+import com.google.gson.Gson;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -38,6 +46,7 @@ public class Scheduler extends Thread implements Runnable {
 	IDynamixFacade dynamix;
 	private SensorProfiler sensorProfiler;
 	private Reporter reporter;
+	private PhoneProfiler phoneProfiler;
 	private Job currentJob;
 	private int resultCounter;
 	
@@ -47,18 +56,24 @@ public class Scheduler extends Thread implements Runnable {
     private boolean free_to_commit = true;
 	
     // scheduler constructor
-	public Scheduler(Handler handler, Context context, SensorProfiler sensorProfiler, Reporter reporter)
+	public Scheduler(Handler handler, Context context, SensorProfiler sensorProfiler, Reporter reporter, PhoneProfiler phoneProfiler)
 	{
 		this.handler = handler;
 		this.context = context;
 		this.sensorProfiler = sensorProfiler;
 		this.reporter = reporter;
+		this.phoneProfiler = phoneProfiler;
 		
 		currentJob = new Job();
 		jobs = new Stack();
 		
 		// get list of permissions about the available sensors
 		sensorsPermissions = sensorProfiler.getSensorsPermissions();
+		
+		for (Map.Entry<String, Boolean> entry : sensorsPermissions.entrySet())
+		{
+		    System.out.println(entry.getKey() + "/" + entry.getValue());
+		}
 	}
 	
 	public void run()
@@ -67,6 +82,34 @@ public class Scheduler extends Thread implements Runnable {
 		{
 			Log.d(TAG, "running");
 			Thread.sleep(1000); //This could be something computationally intensive.
+			
+		//	String phoneId = phoneProfiler.getPhoneId();
+			
+			if( ping() )
+			{
+				String jsonExperiment = getExperiment("samsungG1");
+				
+				Log.i(TAG, jsonExperiment);
+				
+				if(jsonExperiment.equals("0"))
+				{
+					Log.i(TAG, "no experiment for us");
+				}
+				else
+				{
+		//			Gson gson = new Gson();
+		  //      	Experiment experiment = gson.fromJson(jsonExperiment, Experiment.class);				
+
+		    //    	String contextType = experiment.getContextType();
+		      //  	String url = experiment.getUrl();
+
+		     //  	 	Downloader downloader = new Downloader();
+		        
+		    //    	downloader.DownloadFromUrl(url, contextType+"_9.47.1.jar");
+		        
+		    //    	commitJob(contextType);
+		        }
+			}
 		}
 		catch (InterruptedException e)
 		{
@@ -184,11 +227,11 @@ public class Scheduler extends Thread implements Runnable {
 
 		@Override
 		public void onContextEvent(ContextEvent event) throws RemoteException
-		{			  				
+		{					
 			if (event.hasIContextInfo())
-			{				
-			      IContextInfo nativeInfo = event.getIContextInfo();
-			      currentJob.getMsg(nativeInfo);
+			{	
+			IContextInfo nativeInfo = event.getIContextInfo();
+			currentJob.getMsg(nativeInfo);
 			}
 		}
 		
@@ -420,7 +463,9 @@ public class Scheduler extends Thread implements Runnable {
 	}
 	
 	public void deletePlugin(String contextType) throws RemoteException
-	{
+	{				
+	//	dynamix.requestContextPluginUninstall(GpsPLuginInfo);
+		
 		Result result1 = dynamix.removeContextSupportForContextType(dynamixCallback, contextType);
 		if (!result1.wasSuccessful())
 			Log.w(TAG,
@@ -540,7 +585,7 @@ public class Scheduler extends Thread implements Runnable {
 	}
 	
 	public void doJobPlugin(String contextType)
-	{		
+	{				
 		//set do bundle
 		Bundle dojob = new Bundle();
 		dojob.putString("command", "do");
@@ -566,10 +611,12 @@ public class Scheduler extends Thread implements Runnable {
 			Set<String> keys = data.keySet();
 			for(String key : keys)
 			{
-				String value = Double.toString( data.getDouble(key) );
+				String value = data.getString(key);
+				
+				Log.i("key", key);
+				Log.i("value", value);
 				
 				String line = key + "\t" + value + System.getProperty("line.separator");
-				
 				fos.write(line.getBytes());
 			}
 			
@@ -583,10 +630,11 @@ public class Scheduler extends Thread implements Runnable {
 	
 	public void reportJob(String jobId)
 	{
-		currentJob = null;
 		reporter.report(jobId);
-		
 		sendThreadMessage("report_job:" + jobId);
+		
+		stopCurrentPlugin();
+		currentJob = null;
 	}
 	
 	public void sendThreadMessage(String message)
@@ -619,6 +667,106 @@ public class Scheduler extends Thread implements Runnable {
 		sensorsPermissions = sensorProfiler.getSensorsPermissions();
 		Log.i(TAG, "sensor permissions changed");
 		// stop the job if violates the new sensors permissions
+	}
+	
+	private boolean ping()
+	{
+		Ping ping = new Ping();
+		
+		Gson gson = new Gson();
+		String jsonPing = gson.toJson(ping);
+		
+		int pong = sendPing(jsonPing);
+		
+		if(pong == 1)
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private int sendPing(String jsonPing)
+	{
+		final String NAMESPACE = "http://helloworld/";
+		final String URL = "http://150.140.22.232:8080/services/HelloWorld?wsdl"; 
+		final String METHOD_NAME = "Ping";
+		final String SOAP_ACTION =  "";
+		
+		int pong = 0;
+		
+		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME); 
+
+		PropertyInfo propInfo=new PropertyInfo();
+		propInfo.name="arg0";
+		propInfo.type=PropertyInfo.STRING_CLASS;
+		propInfo.setValue(jsonPing);
+  
+		request.addProperty(propInfo);  
+
+		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11); 
+		envelope.setOutputSoapObject(request);
+		
+		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		
+		try
+		{			
+			androidHttpTransport.call(SOAP_ACTION, envelope);
+			SoapPrimitive  resultsRequestSOAP = (SoapPrimitive) envelope.getResponse();
+			
+			pong = Integer.parseInt(resultsRequestSOAP.toString()); 
+		}
+		catch (Exception e)
+		{
+			//
+		}
+		
+		return pong;
+	}
+	
+	private String getExperiment(String phoneId)
+	{
+		Smartphone smartphone = new Smartphone(phoneId);		
+		Gson gson = new Gson();
+		String jsonSmartphone = gson.toJson(smartphone);
+		return sendGetExperiment(jsonSmartphone);
+	}
+	
+	private String sendGetExperiment(String jsonSmartphone)
+	{
+		final String NAMESPACE = "http://helloworld/";
+		final String URL = "http://150.140.22.232:8080/services/HelloWorld?wsdl"; 
+		final String METHOD_NAME = "getExperiment";
+		final String SOAP_ACTION =  "";
+		
+		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME); 
+
+		PropertyInfo propInfo=new PropertyInfo();
+		propInfo.name="arg0";
+		propInfo.type=PropertyInfo.STRING_CLASS;
+		propInfo.setValue(jsonSmartphone);
+  
+		request.addProperty(propInfo);  
+		
+		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11); 
+		envelope.setOutputSoapObject(request);
+		
+		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		
+		try
+		{			
+			androidHttpTransport.call(SOAP_ACTION, envelope);
+			
+			SoapPrimitive resultsRequestSOAP = (SoapPrimitive) envelope.getResponse();
+			
+			return resultsRequestSOAP.toString(); 
+		}
+		catch (Exception e)
+		{
+			//
+		}
+		
+		return "0";
 	}
 			
 }

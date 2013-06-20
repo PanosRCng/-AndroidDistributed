@@ -54,14 +54,14 @@
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
                      android:layout_gravity="center"
-                     android:text="temperature"
+                     android:text="battery charge Level"
                      android:textColor="#36ACF5" />
 
                  <CheckBox
                      android:id="@+id/checkBox2"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:text="charge level" 
+                     android:text="battery temperature" 
                      android:textColor="#36ACF5"/>
 
              </LinearLayout>

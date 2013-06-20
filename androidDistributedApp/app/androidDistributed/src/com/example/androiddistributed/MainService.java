@@ -137,11 +137,11 @@ public class MainService extends Service
         
         // create threads
         phoneProfiler = new PhoneProfiler(handler, context);
-	    registration = new Registration(handler, phoneProfiler);
 	    sensorProfiler = new SensorProfiler(handler, context);
+	    registration = new Registration(handler, phoneProfiler, sensorProfiler);
 		profiler = new Profiler(handler, phoneProfiler);
 	    reporter = new Reporter(handler, context);
-	    scheduler = new Scheduler(handler, context, sensorProfiler, reporter);
+	    scheduler = new Scheduler(handler, context, sensorProfiler, reporter, phoneProfiler);
         
 	    // give some time to threads to start
 	    try

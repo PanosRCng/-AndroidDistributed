@@ -7,6 +7,8 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 
 public class securityTab extends Activity{
@@ -15,7 +17,14 @@ public class securityTab extends Activity{
 	private ImageView batteryImgv;
 	private ImageView gpsImgv;
 	private ImageView wifiImgv;
+	
+	private CheckBox chkBatteryLevel;
+	private CheckBox chkBatteryTemperature;
+	
 	private boolean batteryEnabled;
+	private boolean batteryLevelEnabled;
+	private boolean batteryTemperatureEnabled;
+	
 	private boolean gpsEnabled;
 	private boolean wifiEnabled;
 	private SharedPreferences pref;
@@ -30,7 +39,45 @@ public class securityTab extends Activity{
         batteryImgv = (ImageView) findViewById(R.id.imageView1);
         gpsImgv = (ImageView) findViewById(R.id.imageView2);
         wifiImgv = (ImageView) findViewById(R.id.imageView3);
+    
+    	chkBatteryLevel = (CheckBox) findViewById(R.id.checkBox1);
+    	chkBatteryLevel.setOnClickListener(new OnClickListener()
+        {
+        	@Override
+        	public void onClick(View v)
+        	{
+        		if (((CheckBox) v).isChecked())
+        		{
+        			editor.putBoolean("batteryLevel", true);
+        		}
+        		else
+        		{
+        			editor.putBoolean("batteryLevel", false);	
+        		}
+        		
+        		editor.commit();
+        	}
+    	});
         
+    	chkBatteryTemperature = (CheckBox) findViewById(R.id.checkBox2);
+    	chkBatteryTemperature.setOnClickListener(new OnClickListener()
+        {
+        	@Override
+        	public void onClick(View v)
+        	{
+        		if (((CheckBox) v).isChecked())
+        		{
+        			editor.putBoolean("batteryTemperature", true);
+        		}
+        		else
+        		{
+        			editor.putBoolean("batteryTemperature", false);	
+        		}
+        		
+        		editor.commit();
+        	}
+    	});
+    	
         pref = getApplicationContext().getSharedPreferences("sensors", 0); // 0 - for private mode
         editor = pref.edit();
                         
@@ -47,7 +94,11 @@ public class securityTab extends Activity{
         if( !(pref.contains("firstTime")) )
         {
         	editor.putBoolean("firstTime", false);
+        	
         	editor.putBoolean("battery", false);
+        	editor.putBoolean("batteryLevel", false);
+        	editor.putBoolean("battertTemperature", false);
+        	
         	editor.putBoolean("gps", false);
         	editor.putBoolean("wifi", false);
            	
@@ -55,18 +106,31 @@ public class securityTab extends Activity{
         }
 
         batteryEnabled = pref.getBoolean("battery", false);
+        batteryLevelEnabled = pref.getBoolean("batteryLevel", false);
+        batteryTemperatureEnabled = pref.getBoolean("batteryTemperature", false);
+        
         gpsEnabled = pref.getBoolean("gps", false);
         wifiEnabled = pref.getBoolean("wifi", false);
    	
     	if( batteryEnabled )
     	{
     		batteryImgv.setImageResource(R.drawable.battery_enabled);
+    		
+        	if( batteryLevelEnabled )
+        	{
+        		chkBatteryLevel.setChecked(true);
+        	}	
+        	
+        	if( batteryTemperatureEnabled )
+        	{
+        		chkBatteryTemperature.setChecked(true);
+        	}
     	}
     	else
     	{
             batteryImgv.setImageResource(R.drawable.battery_disabled);
     	}
-   	
+    		
     	if( gpsEnabled )
     	{
     		gpsImgv.setImageResource(R.drawable.gps_enabled);
@@ -91,10 +155,22 @@ public class securityTab extends Activity{
     	if(!batteryEnabled)
     	{
         	editor.putBoolean("battery", true);
+        	
+        	chkBatteryLevel.setEnabled(true);
+        	chkBatteryTemperature.setEnabled(true);	
+        	
+        	editor.putBoolean("batteryLevel", true);
+        	editor.putBoolean("batteryTemperature", true);
     	}
     	else
     	{
-        	editor.putBoolean("battery", false);   		
+        	editor.putBoolean("battery", false); 
+        	
+        	chkBatteryLevel.setEnabled(false);
+        	chkBatteryTemperature.setEnabled(false);
+        	
+        	editor.putBoolean("batteryLevel", false);
+        	editor.putBoolean("batteryTemperature", false);
     	}
 
     	setRules();

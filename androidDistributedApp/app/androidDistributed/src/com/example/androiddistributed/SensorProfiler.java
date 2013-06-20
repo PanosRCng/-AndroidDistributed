@@ -27,6 +27,8 @@ public class SensorProfiler extends Thread implements Runnable {
 	private final String TAG = this.getClass().getSimpleName();
 
 	private boolean batteryEnabled;
+	private boolean batteryLevelEnabled;
+	private boolean batteryTemperatureEnabled;
 	private boolean gpsEnabled;
 	private boolean wifiEnabled;
 	private SharedPreferences pref;
@@ -36,6 +38,7 @@ public class SensorProfiler extends Thread implements Runnable {
 	private List<String> permissions;
 	private Map<String,Boolean> sensorsPermissions=new HashMap<String, Boolean>();
 	private Map<String,String> sensorsContextTypes=new HashMap<String, String>();
+	private String sensorRules="|";
 	
 	private  NetworkStateReceiver mReceiver;
 	
@@ -45,22 +48,18 @@ public class SensorProfiler extends Thread implements Runnable {
 	{		
 		this.handler = handler;
 		this.context = context;
-		
+				
         pref = context.getApplicationContext().getSharedPreferences("sensors", 0); // 0 - for private mode
         editor = pref.edit();
 		
         mReceiver = new NetworkStateReceiver();
         
 		sensors= new ArrayList<String>();
-		//
-		// getAvailableSensors();
-		sensors.add("battery");
-		sensors.add("wifi");
-		sensors.add("gps");
-		//
+		sensors = getAvailableSensors(context);
 		
 		// map sensors to contextTypes
-		sensorsContextTypes.put("battery", "org.ambientdynamix.contextplugins.oneplugin");
+		sensorsContextTypes.put("batteryLevel", "org.ambientdynamix.contextplugins.batteryLevelPlugin");
+		sensorsContextTypes.put("batteryTemperature", "org.ambientdynamix.contextplugins.batteryTemperaturePlugin");		
 		
 		// get sensor permissions
 		permissions = new ArrayList<String>();
@@ -93,13 +92,13 @@ public class SensorProfiler extends Thread implements Runnable {
 			}
 			
 			// get available sensors on this android device
-		    getAvailableSensors(context);
+	//	    sensors = getAvailableSensors(context);
 		    
 		     // get user permisions about sensors
-			getPermissions();
+	//		getPermissions();
 			     
 			     // set sensor permitions
-			setPermissions(); 		
+	//		setPermissions(); 		
 		}
 		catch (InterruptedException e)
 		{
@@ -122,6 +121,11 @@ public class SensorProfiler extends Thread implements Runnable {
 		return sensorsPermissions;
 	}
 	
+	public String getSensorRules()
+	{
+		return sensorRules;
+	}
+	
 	// set the user permissions about the sensors
 	private void setPermissions()
 	{		
@@ -130,6 +134,7 @@ public class SensorProfiler extends Thread implements Runnable {
 			if(permissions.contains(sensor))
 			{
 				sensorsPermissions.put( sensorsContextTypes.get(sensor) , true);
+				sensorRules = sensorRules + sensor + "|";
 			}
 			else
 			{
@@ -146,21 +151,36 @@ public class SensorProfiler extends Thread implements Runnable {
 	    // run first time after installation - or data clean
 	    if( !(pref.contains("firstTime")) )
 	    {
-	    	editor.putBoolean("firstTime", false);
-	    	editor.putBoolean("battery", false);
-	    	editor.putBoolean("gps", false);
-	    	editor.putBoolean("wifi", false);
-	           	
-	        editor.commit();
+        	editor.putBoolean("firstTime", false);
+        	
+        	editor.putBoolean("battery", false);
+        	editor.putBoolean("batteryLevel", false);
+        	editor.putBoolean("battertTemperature", false);
+        	
+        	editor.putBoolean("gps", false);
+        	editor.putBoolean("wifi", false);
+           	
+        	editor.commit();
 	    }
 
-	    batteryEnabled = pref.getBoolean("battery", false);
+
+        batteryEnabled = pref.getBoolean("battery", false);
+        batteryLevelEnabled = pref.getBoolean("batteryLevel", false);
+        batteryTemperatureEnabled = pref.getBoolean("batteryTemperature", false);
 	    gpsEnabled = pref.getBoolean("gps", false);
 	    wifiEnabled = pref.getBoolean("wifi", false);
 	   	
 	    if( batteryEnabled )
 	    {
-	    	permissions.add("battery");
+	    	if( batteryLevelEnabled )
+	    	{
+	    		permissions.add("batteryLevel");
+	    	}
+	    	
+	    	if( batteryTemperatureEnabled )
+	    	{
+	    		permissions.add("batteryTemperature");
+	    	}
 	    }
 	   	
 	    if( gpsEnabled )
@@ -191,7 +211,7 @@ public class SensorProfiler extends Thread implements Runnable {
 	    	switch(type)
 	    	{
 	    		case Sensor.TYPE_ACCELEROMETER : { type_s = "accelerometer"; break; }
-	    		case Sensor.TYPE_TEMPERATURE : { type_s = "temperature"; break; }
+	    		case Sensor.TYPE_TEMPERATURE : { type_s = "batteryTemperature"; break; }
 	    		case Sensor.TYPE_MAGNETIC_FIELD : { type_s = "magnetic field"; break; }
 	    		case Sensor.TYPE_ORIENTATION : { type_s = "orientation"; break;  }
 	    		default : { type_s = "uknown" ; break; }
@@ -200,7 +220,11 @@ public class SensorProfiler extends Thread implements Runnable {
 	    	// add it to sensor list
 	    	listSensorType.add(type_s);
 	    }
-	       
+	      
+	    // always available
+	    listSensorType.add("batteryLevel");
+	    listSensorType.add("batteryTemperature");
+	    
 	    return listSensorType;
 	}
 	
