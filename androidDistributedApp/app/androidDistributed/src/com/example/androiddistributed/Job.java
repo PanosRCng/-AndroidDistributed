@@ -6,9 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientdynamix.api.application.IContextInfo;
-import org.ambientdynamix.contextplugins.addplugin.IAddPluginInfo;
+import org.ambientdynamix.contextplugins.WifiPlugin.IWifiPluginInfo;
 import org.ambientdynamix.contextplugins.batteryLevelPlugin.IBatteryLevelPluginInfo;
 import org.ambientdynamix.contextplugins.batteryTemperaturePlugin.IBatteryTemperaturePluginInfo;
+import org.ambientdynamix.contextplugins.gpsplugin.IGpsPluginInfo;
+import org.ambientdynamix.contextplugins.myExperimentPlugin.IExperimentPluginInfo;
 import org.ambientdynamix.contextplugins.oneplugin.IOnePluginInfo;
 
 import android.os.Bundle;
@@ -49,12 +51,12 @@ public class Job {
 	
 
 	public void getMsg(IContextInfo nativeInfo)
-	{	
-		if(nativeInfo instanceof IAddPluginInfo)
-		{
-			IAddPluginInfo info = (IAddPluginInfo) nativeInfo;
+	{			
+		if(nativeInfo instanceof IExperimentPluginInfo)
+		{			
+			IExperimentPluginInfo info = (IExperimentPluginInfo) nativeInfo;
 			String pluginState = info.getState();
-
+			
 			if( jobState.equals("not_ready") )
 			{	
 				if(pluginState.equals("ready"))
@@ -63,8 +65,7 @@ public class Job {
 					setDependencies(info.getDependencies());
 
 					for(String dependency : dependencies)
-					{
-						
+					{							
 						if( scheduler.sensorsPermissions.get(dependency) )
 						{							
 							setAllowedDependency(dependency, true);
@@ -139,7 +140,7 @@ public class Job {
 			}
 		}
 		else if(nativeInfo instanceof IBatteryLevelPluginInfo)
-		{
+		{			
 			IBatteryLevelPluginInfo info = (IBatteryLevelPluginInfo) nativeInfo;
 
 			if( jobState.equals("pending_initialization") )
@@ -198,6 +199,70 @@ public class Job {
 				Bundle data = new Bundle();
 				data.putString("command", info.getContextType());
 				data.putString("data", Integer.toString(batteryTemperature));
+				
+				scheduler.sendData(this.getContextType(), data);
+			}	
+		}
+		else if(nativeInfo instanceof IGpsPluginInfo)
+		{
+			IGpsPluginInfo info = (IGpsPluginInfo) nativeInfo;
+
+			if( jobState.equals("pending_initialization") )
+			{	
+				setWakedDependency(nativeInfo.getContextType(), true);
+
+				if( isDependenciesWaked() && isDependenciesAllowed() )
+				{
+					setState("initialized");
+
+					scheduler.doJobPlugin(this.getContextType());
+					for(String dependency : dependencies)
+					{
+						scheduler.doJobPlugin(dependency);
+					}
+
+					setState("running");
+				}
+			}
+			else if( jobState.equals("running") )
+			{				
+				String position = info.getPosition();	
+				
+				Bundle data = new Bundle();
+				data.putString("command", info.getContextType());
+				data.putString("data", position);
+				
+				scheduler.sendData(this.getContextType(), data);
+			}	
+		}
+		else if(nativeInfo instanceof IWifiPluginInfo)
+		{
+			IWifiPluginInfo info = (IWifiPluginInfo) nativeInfo;
+
+			if( jobState.equals("pending_initialization") )
+			{	
+				setWakedDependency(nativeInfo.getContextType(), true);
+
+				if( isDependenciesWaked() && isDependenciesAllowed() )
+				{
+					setState("initialized");
+
+					scheduler.doJobPlugin(this.getContextType());
+					for(String dependency : dependencies)
+					{
+						scheduler.doJobPlugin(dependency);
+					}
+
+					setState("running");
+				}
+			}
+			else if( jobState.equals("running") )
+			{				
+				String bssid = info.getBssid();	
+				
+				Bundle data = new Bundle();
+				data.putString("command", info.getContextType());
+				data.putString("data", bssid);
 				
 				scheduler.sendData(this.getContextType(), data);
 			}	

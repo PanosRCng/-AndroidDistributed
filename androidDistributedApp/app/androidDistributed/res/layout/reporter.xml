@@ -5,7 +5,7 @@
         android:background="#000000" >
 
    <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
             <TextView
@@ -34,12 +34,12 @@
             android:background="#7F7E85" />
    
    <LinearLayout
-       android:layout_width="match_parent"
+       android:layout_width="fill_parent"
        android:layout_height="wrap_content"
        android:orientation="vertical" >
 
        <LinearLayout
-           android:layout_width="match_parent"
+           android:layout_width="fill_parent"
            android:layout_height="wrap_content" >
 
            <ImageView
@@ -50,8 +50,8 @@
                android:src="@drawable/no_job_report" />
 
            <LinearLayout
-               android:layout_width="match_parent"
-               android:layout_height="match_parent"
+               android:layout_width="fill_parent"
+               android:layout_height="fill_parent"
                android:orientation="vertical" >
 
                <TextView
@@ -101,7 +101,7 @@
    </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 

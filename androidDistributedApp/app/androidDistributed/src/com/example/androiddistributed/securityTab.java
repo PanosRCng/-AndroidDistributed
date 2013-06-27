@@ -20,13 +20,19 @@ public class securityTab extends Activity{
 	
 	private CheckBox chkBatteryLevel;
 	private CheckBox chkBatteryTemperature;
+	private CheckBox chkGpsPosition;
+	private CheckBox chkWifiBSSID;
 	
 	private boolean batteryEnabled;
 	private boolean batteryLevelEnabled;
 	private boolean batteryTemperatureEnabled;
 	
 	private boolean gpsEnabled;
+	private boolean gpsPositionEnabled;
+	
 	private boolean wifiEnabled;
+	private boolean wifiBSSIDEnabled;
+	
 	private SharedPreferences pref;
 	private Editor editor;
 	
@@ -78,6 +84,44 @@ public class securityTab extends Activity{
         	}
     	});
     	
+    	chkGpsPosition = (CheckBox) findViewById(R.id.checkBox3);
+    	chkGpsPosition.setOnClickListener(new OnClickListener()
+        {
+        	@Override
+        	public void onClick(View v)
+        	{
+        		if (((CheckBox) v).isChecked())
+        		{
+        			editor.putBoolean("gpsPosition", true);
+        		}
+        		else
+        		{
+        			editor.putBoolean("gpsPosition", false);	
+        		}
+        		
+        		editor.commit();
+        	}
+    	});
+    	
+    	chkWifiBSSID = (CheckBox) findViewById(R.id.checkBox5);
+    	chkWifiBSSID.setOnClickListener(new OnClickListener()
+        {
+        	@Override
+        	public void onClick(View v)
+        	{
+        		if (((CheckBox) v).isChecked())
+        		{
+        			editor.putBoolean("wifiBSSID", true);
+        		}
+        		else
+        		{
+        			editor.putBoolean("wifiBSSID", false);	
+        		}
+        		
+        		editor.commit();
+        	}
+    	});
+    	
         pref = getApplicationContext().getSharedPreferences("sensors", 0); // 0 - for private mode
         editor = pref.edit();
                         
@@ -100,8 +144,12 @@ public class securityTab extends Activity{
         	editor.putBoolean("battertTemperature", false);
         	
         	editor.putBoolean("gps", false);
+        	editor.putBoolean("gpsPosition", false);
+        	
         	editor.putBoolean("wifi", false);
            	
+        	editor.putBoolean("wifiBSSID", false);
+        	
         	editor.commit();
         }
 
@@ -110,8 +158,11 @@ public class securityTab extends Activity{
         batteryTemperatureEnabled = pref.getBoolean("batteryTemperature", false);
         
         gpsEnabled = pref.getBoolean("gps", false);
+        gpsPositionEnabled = pref.getBoolean("gpsPosition", false);
+        
         wifiEnabled = pref.getBoolean("wifi", false);
-   	
+        wifiBSSIDEnabled = pref.getBoolean("wifiBSSID", false);
+        
     	if( batteryEnabled )
     	{
     		batteryImgv.setImageResource(R.drawable.battery_enabled);
@@ -134,6 +185,11 @@ public class securityTab extends Activity{
     	if( gpsEnabled )
     	{
     		gpsImgv.setImageResource(R.drawable.gps_enabled);
+    		
+        	if( gpsPositionEnabled )
+        	{
+        		chkGpsPosition.setChecked(true);
+        	}	
     	}
     	else
     	{
@@ -143,6 +199,11 @@ public class securityTab extends Activity{
     	if( wifiEnabled )
     	{
     		wifiImgv.setImageResource(R.drawable.wifi_enabled);
+    		
+    		if( wifiBSSIDEnabled )
+    		{
+    			chkWifiBSSID.setChecked(true);
+    		}
     	}
     	else
     	{
@@ -182,10 +243,18 @@ public class securityTab extends Activity{
     	if(!gpsEnabled)
     	{
         	editor.putBoolean("gps", true);
+        	        	
+        	chkGpsPosition.setEnabled(true);
+        	
+        	editor.putBoolean("gpsPosition", true);
     	}
     	else
     	{
         	editor.putBoolean("gps", false);
+        	
+        	chkGpsPosition.setEnabled(false);
+        	
+        	editor.putBoolean("gpsPosition", false);
     	}
     	
     	setRules();
@@ -197,10 +266,18 @@ public class securityTab extends Activity{
     	if(!wifiEnabled)
     	{
         	editor.putBoolean("wifi", true);
+        	
+        	chkWifiBSSID.setEnabled(true);
+        	
+        	editor.putBoolean("wifiBSSID", true);
     	}
     	else
     	{
         	editor.putBoolean("wifi", false);
+        	
+        	chkWifiBSSID.setEnabled(true);
+        	
+        	editor.putBoolean("wifiBSSID", true);
     	}
     	
     	setRules();

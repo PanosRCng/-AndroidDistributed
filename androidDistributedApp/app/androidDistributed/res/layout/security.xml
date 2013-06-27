@@ -5,7 +5,7 @@
         android:background="#000000" >
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
@@ -27,12 +27,12 @@
         android:background="#7F7E85" />
 
      <LinearLayout
-         android:layout_width="match_parent"
+         android:layout_width="fill_parent"
          android:layout_height="wrap_content"
          android:orientation="vertical" >
 
          <LinearLayout
-             android:layout_width="match_parent"
+             android:layout_width="fill_parent"
              android:layout_height="wrap_content"
              android:layout_gravity="center" >
 
@@ -69,7 +69,7 @@
          </LinearLayout>
 
          <LinearLayout
-             android:layout_width="match_parent"
+             android:layout_width="fill_parent"
              android:layout_height="wrap_content" >
 
              <ImageView
@@ -82,14 +82,14 @@
 
              <LinearLayout
                  android:layout_width="wrap_content"
-                 android:layout_height="match_parent"
+                 android:layout_height="fill_parent"
                  android:orientation="vertical" >
 
                  <CheckBox
                      android:id="@+id/checkBox3"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:text="CheckBox" 
+                     android:text="position" 
                      android:textColor="#36ACF5"/>
 
                  <CheckBox
@@ -106,7 +106,7 @@
      </LinearLayout>
 
      <LinearLayout
-         android:layout_width="match_parent"
+         android:layout_width="fill_parent"
          android:layout_height="wrap_content" >
 
          <ImageView
@@ -146,7 +146,7 @@
         android:background="#7F7E85" />
      
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
        

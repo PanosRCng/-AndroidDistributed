@@ -15,13 +15,14 @@ public class MainService extends Service
 		
 	private Context context;
 	
+	private Demon demon;
     private Scheduler scheduler;
     private Profiler profiler;
     private SensorProfiler sensorProfiler;
     private Reporter reporter;
     private PhoneProfiler phoneProfiler;
     private Registration registration;
-	
+    private Communication communication;
 	
     static final int MSG_CONNECT_TO_DYNAMIX = 1;
     static final int MSG_DISCONNECT_DYNAMIX = 2;
@@ -50,6 +51,7 @@ public class MainService extends Service
                 	scheduler.startCurrentJob();
                 	break;
                 case MSG_SENSORS_PERMISSIONS_CHANGED:
+                	sensorProfiler.sensorsPermissionsChanged();
                 	scheduler.sensorsPermissionsChanged();
                 default:
                     super.handleMessage(msg);
@@ -136,13 +138,15 @@ public class MainService extends Service
         context = this.getApplicationContext();
         
         // create threads
+        communication = new Communication(handler);
         phoneProfiler = new PhoneProfiler(handler, context);
-	    sensorProfiler = new SensorProfiler(handler, context);
-	    registration = new Registration(handler, phoneProfiler, sensorProfiler);
+	    sensorProfiler = new SensorProfiler(handler, context, communication, phoneProfiler);
+	    registration = new Registration(handler, communication, phoneProfiler, sensorProfiler);
 		profiler = new Profiler(handler, phoneProfiler);
-	    reporter = new Reporter(handler, context);
+	    reporter = new Reporter(handler, context, communication);
 	    scheduler = new Scheduler(handler, context, sensorProfiler, reporter, phoneProfiler);
-        
+        demon = new Demon(handler, context, communication, scheduler, phoneProfiler, sensorProfiler);
+	    
 	    // give some time to threads to start
 	    try
 	    {
@@ -154,18 +158,20 @@ public class MainService extends Service
 	    }
 	    
 	    // start threads
+	    communication.start();
 		phoneProfiler.start();
 	    sensorProfiler.start();
 		registration.start();
 	    profiler.start();
 	    reporter.start();
 		scheduler.start();
+		demon.start();
 	    
 		// connect to dynamix framework
 		scheduler.connect_to_dynamix();
 	
 		// commit job/plugin test to dynamix framework
-		scheduler.commitJob("org.ambientdynamix.contextplugins.addplugin");
+//		scheduler.commitJob("org.ambientdynamix.contextplugins.addplugin");
 		
         return mMessenger.getBinder();
     }

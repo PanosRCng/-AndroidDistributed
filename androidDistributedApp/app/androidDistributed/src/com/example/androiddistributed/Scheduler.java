@@ -47,7 +47,7 @@ public class Scheduler extends Thread implements Runnable {
 	private SensorProfiler sensorProfiler;
 	private Reporter reporter;
 	private PhoneProfiler phoneProfiler;
-	private Job currentJob;
+	public Job currentJob;
 	private int resultCounter;
 	
 	Stack jobs;
@@ -69,11 +69,6 @@ public class Scheduler extends Thread implements Runnable {
 		
 		// get list of permissions about the available sensors
 		sensorsPermissions = sensorProfiler.getSensorsPermissions();
-		
-		for (Map.Entry<String, Boolean> entry : sensorsPermissions.entrySet())
-		{
-		    System.out.println(entry.getKey() + "/" + entry.getValue());
-		}
 	}
 	
 	public void run()
@@ -82,34 +77,6 @@ public class Scheduler extends Thread implements Runnable {
 		{
 			Log.d(TAG, "running");
 			Thread.sleep(1000); //This could be something computationally intensive.
-			
-		//	String phoneId = phoneProfiler.getPhoneId();
-			
-			if( ping() )
-			{
-				String jsonExperiment = getExperiment("samsungG1");
-				
-				Log.i(TAG, jsonExperiment);
-				
-				if(jsonExperiment.equals("0"))
-				{
-					Log.i(TAG, "no experiment for us");
-				}
-				else
-				{
-		//			Gson gson = new Gson();
-		  //      	Experiment experiment = gson.fromJson(jsonExperiment, Experiment.class);				
-
-		    //    	String contextType = experiment.getContextType();
-		      //  	String url = experiment.getUrl();
-
-		     //  	 	Downloader downloader = new Downloader();
-		        
-		    //    	downloader.DownloadFromUrl(url, contextType+"_9.47.1.jar");
-		        
-		    //    	commitJob(contextType);
-		        }
-			}
 		}
 		catch (InterruptedException e)
 		{
@@ -668,105 +635,6 @@ public class Scheduler extends Thread implements Runnable {
 		Log.i(TAG, "sensor permissions changed");
 		// stop the job if violates the new sensors permissions
 	}
-	
-	private boolean ping()
-	{
-		Ping ping = new Ping();
-		
-		Gson gson = new Gson();
-		String jsonPing = gson.toJson(ping);
-		
-		int pong = sendPing(jsonPing);
-		
-		if(pong == 1)
-		{
-			return true;
-		}
-		
-		return false;
-	}
-	
-	private int sendPing(String jsonPing)
-	{
-		final String NAMESPACE = "http://helloworld/";
-		final String URL = "http://150.140.22.232:8080/services/HelloWorld?wsdl"; 
-		final String METHOD_NAME = "Ping";
-		final String SOAP_ACTION =  "";
-		
-		int pong = 0;
-		
-		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME); 
 
-		PropertyInfo propInfo=new PropertyInfo();
-		propInfo.name="arg0";
-		propInfo.type=PropertyInfo.STRING_CLASS;
-		propInfo.setValue(jsonPing);
-  
-		request.addProperty(propInfo);  
-
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11); 
-		envelope.setOutputSoapObject(request);
-		
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
-		
-		try
-		{			
-			androidHttpTransport.call(SOAP_ACTION, envelope);
-			SoapPrimitive  resultsRequestSOAP = (SoapPrimitive) envelope.getResponse();
-			
-			pong = Integer.parseInt(resultsRequestSOAP.toString()); 
-		}
-		catch (Exception e)
-		{
-			//
-		}
-		
-		return pong;
-	}
 	
-	private String getExperiment(String phoneId)
-	{
-		Smartphone smartphone = new Smartphone(phoneId);		
-		Gson gson = new Gson();
-		String jsonSmartphone = gson.toJson(smartphone);
-		return sendGetExperiment(jsonSmartphone);
-	}
-	
-	private String sendGetExperiment(String jsonSmartphone)
-	{
-		final String NAMESPACE = "http://helloworld/";
-		final String URL = "http://150.140.22.232:8080/services/HelloWorld?wsdl"; 
-		final String METHOD_NAME = "getExperiment";
-		final String SOAP_ACTION =  "";
-		
-		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME); 
-
-		PropertyInfo propInfo=new PropertyInfo();
-		propInfo.name="arg0";
-		propInfo.type=PropertyInfo.STRING_CLASS;
-		propInfo.setValue(jsonSmartphone);
-  
-		request.addProperty(propInfo);  
-		
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11); 
-		envelope.setOutputSoapObject(request);
-		
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
-		
-		try
-		{			
-			androidHttpTransport.call(SOAP_ACTION, envelope);
-			
-			SoapPrimitive resultsRequestSOAP = (SoapPrimitive) envelope.getResponse();
-			
-			return resultsRequestSOAP.toString(); 
-		}
-		catch (Exception e)
-		{
-			//
-		}
-		
-		return "0";
-	}
-			
 }

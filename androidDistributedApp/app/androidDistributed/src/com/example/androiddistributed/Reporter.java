@@ -1,6 +1,12 @@
 package com.example.androiddistributed;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -22,11 +28,13 @@ public class Reporter extends Thread implements Runnable {
 	
 	private Handler handler;
 	private Context context;
+	private Communication communication;
 	
-	public Reporter(Handler handler, Context context)
+	public Reporter(Handler handler, Context context, Communication communication)
 	{
 		this.handler = handler;
 		this.context = context;
+		this.communication = communication;
 	}
 	
 	public void run()
@@ -53,12 +61,12 @@ public class Reporter extends Thread implements Runnable {
 	{
 		Log.i(TAG, "reporter report job with job_id: " + jobId);
 		
-		if( ping() )
-		{
-			Report report = new Report(jobId);
-			report.setResultsUrl(jobId+"_report");
+		if( communication.ping() )
+		{		
+			Log.i("WTF", "we got a ping");
 			
 			String jobReportPath = null;
+			ArrayList<String> jobResults = new ArrayList<String>();
 			
 			File dir = context.getFilesDir();		
 			File[] files = dir.listFiles();
@@ -67,111 +75,62 @@ public class Reporter extends Thread implements Runnable {
 				if( file.getName().equals(jobId+"_report") )
 				{
 					jobReportPath = file.getName();
+					
+					jobResults = readResultsFromFile(jobReportPath);
+					
+					if(jobResults.size() > 0)
+					{						
+						Report report = new Report(jobId);
+						report.setResults(jobResults);
+						
+						Gson gson = new Gson();
+						String jsonReport = gson.toJson(report);
+										
+						int ack = communication.sendReportResults(jsonReport);
+						
+						Log.i(TAG, Integer.toString(ack));
+						
+						if(ack == 1)
+						{
+		                    if( file.delete() )
+		                    {
+		                    	Log.i(TAG, "ok we finish here");
+		                    	
+		                    	// refresh report tab
+		                    }
+						}
+					}
 				}
 			}
-			
-			UploadReport uploadReport = new UploadReport();
-			uploadReport.upload(jobReportPath);
-			
-			Gson gson = new Gson();
-			String jsonReport = gson.toJson(report);
-						
-			sendReportResults(jsonReport);
 		}
 	}
-	
-	private boolean ping()
+		
+	private ArrayList<String> readResultsFromFile(String jobReportPath)
 	{
-		Ping ping = new Ping();
-		
-		Gson gson = new Gson();
-		String jsonPing = gson.toJson(ping);
-		
-		int pong = sendPing(jsonPing);
-		
-		if(pong == 1)
-		{
-			return true;
-		}
-		
-		return false;
-	}
-	
-	
-	private int sendReportResults(String jsonReport)
-	{
-		final String NAMESPACE = "http://helloworld/";
-		final String URL = "http://150.140.22.232:8080/services/HelloWorld?wsdl"; 
-		final String METHOD_NAME = "reportResults";
-		final String SOAP_ACTION =  "";
-		
-		int ack = 0;
-		
-		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME); 
-
-		PropertyInfo propInfo=new PropertyInfo();
-		propInfo.name="arg0";
-		propInfo.type=PropertyInfo.STRING_CLASS;
-		propInfo.setValue(jsonReport);
-  
-		request.addProperty(propInfo);  
-
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11); 
-		envelope.setOutputSoapObject(request);
-		
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
+		ArrayList<String> jobResults = new ArrayList<String>();
 		
 		try
-		{			
-			androidHttpTransport.call(SOAP_ACTION, envelope);
-			SoapPrimitive  resultsRequestSOAP = (SoapPrimitive) envelope.getResponse();
-			
-			ack = Integer.parseInt(resultsRequestSOAP.toString()); 
-		}
-		catch (Exception e)
 		{
-			//
-		}
+			FileInputStream fis = context.openFileInput(jobReportPath);
 		
-		return ack;
-	}
-		
-	private int sendPing(String jsonPing)
-	{
-		final String NAMESPACE = "http://helloworld/";
-		final String URL = "http://150.140.22.232:8080/services/HelloWorld?wsdl"; 
-		final String METHOD_NAME = "Ping";
-		final String SOAP_ACTION =  "";
-		
-		int pong = 0;
-		
-		SoapObject request = new SoapObject(NAMESPACE, METHOD_NAME); 
-
-		PropertyInfo propInfo=new PropertyInfo();
-		propInfo.name="arg0";
-		propInfo.type=PropertyInfo.STRING_CLASS;
-		propInfo.setValue(jsonPing);
-  
-		request.addProperty(propInfo);  
-
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11); 
-		envelope.setOutputSoapObject(request);
-		
-		HttpTransportSE androidHttpTransport = new HttpTransportSE(URL);
-		
-		try
-		{			
-			androidHttpTransport.call(SOAP_ACTION, envelope);
-			SoapPrimitive  resultsRequestSOAP = (SoapPrimitive) envelope.getResponse();
+			InputStreamReader in = new InputStreamReader(fis);
+			BufferedReader br = new BufferedReader(in);
 			
-			pong = Integer.parseInt(resultsRequestSOAP.toString()); 
+			String data = br.readLine();
+			jobResults.add(data);
+			
+			while( data != null )
+			{
+				data = br.readLine();
+				jobResults.add(data);
+			}
 		}
-		catch (Exception e)
+		catch(Exception e)
 		{
-			//
+			Log.e(TAG, e.toString());
 		}
 		
-		return pong;
+		return jobResults;
 	}
 	
 	public void sendThreadMessage(String message)

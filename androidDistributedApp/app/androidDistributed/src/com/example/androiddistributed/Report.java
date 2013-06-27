@@ -1,23 +1,25 @@
 package com.example.androiddistributed;
 
+import java.util.ArrayList;
+
 public class Report{
 
-	private String jobName;
-	private String resultsUrl;
+	private String jobName;	
+	private ArrayList<String> jobResults;
 	
 	public Report(String jobName)
 	{
 		this.jobName = jobName;
 	}
 	
-	public void setResultsUrl(String resultsUrl)
+	public void setResults(ArrayList<String> jobResults)
 	{
-		this.resultsUrl = resultsUrl;
+		this.jobResults = jobResults;
 	}
 	
-	public String getResultsUrl()
+	public ArrayList<String> getResults()
 	{
-		return this.resultsUrl;
+		return this.jobResults;
 	}
 	
 	public String getName()

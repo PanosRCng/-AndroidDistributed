@@ -22,6 +22,8 @@ import android.util.Log;
 public class SensorProfiler extends Thread implements Runnable {
 
 	private Handler handler;
+	private Communication communication;
+	private PhoneProfiler phoneProfiler;
 	
 	// get TAG name for reporting to LogCat
 	private final String TAG = this.getClass().getSimpleName();
@@ -30,7 +32,9 @@ public class SensorProfiler extends Thread implements Runnable {
 	private boolean batteryLevelEnabled;
 	private boolean batteryTemperatureEnabled;
 	private boolean gpsEnabled;
+	private boolean gpsPositionEnabled;
 	private boolean wifiEnabled;
+	private boolean wifiBSSIDEnabled;
 	private SharedPreferences pref;
 	private Editor editor;
 	
@@ -44,10 +48,12 @@ public class SensorProfiler extends Thread implements Runnable {
 	
 	Context context;
 	
-	public SensorProfiler(Handler handler, Context context)
+	public SensorProfiler(Handler handler, Context context, Communication communication, PhoneProfiler phoneProfiler)
 	{		
 		this.handler = handler;
 		this.context = context;
+		this.communication = communication;
+		this.phoneProfiler = phoneProfiler;
 				
         pref = context.getApplicationContext().getSharedPreferences("sensors", 0); // 0 - for private mode
         editor = pref.edit();
@@ -60,6 +66,8 @@ public class SensorProfiler extends Thread implements Runnable {
 		// map sensors to contextTypes
 		sensorsContextTypes.put("batteryLevel", "org.ambientdynamix.contextplugins.batteryLevelPlugin");
 		sensorsContextTypes.put("batteryTemperature", "org.ambientdynamix.contextplugins.batteryTemperaturePlugin");		
+		sensorsContextTypes.put("gpsPosition", "org.ambientdynamix.contextplugins.gpsplugin");		
+		sensorsContextTypes.put("wifiBSSID", "org.ambientdynamix.contextplugins.Wifiplugin");
 		
 		// get sensor permissions
 		permissions = new ArrayList<String>();
@@ -73,9 +81,6 @@ public class SensorProfiler extends Thread implements Runnable {
 		{
 			Log.d(TAG, "running");
 			Thread.sleep(1000); //This could be something computationally intensive.
-
-			//IntentFilter intentFilter = new IntentFilter();
-	        //context.registerReceiver(mReceiver, intentFilter);
 			
 	        // register network status receiver
 	        IntentFilter filter = new IntentFilter();
@@ -90,15 +95,7 @@ public class SensorProfiler extends Thread implements Runnable {
 			{
 				sendThreadMessage("internet_status:no_internet");
 			}
-			
-			// get available sensors on this android device
-	//	    sensors = getAvailableSensors(context);
-		    
-		     // get user permisions about sensors
-	//		getPermissions();
-			     
-			     // set sensor permitions
-	//		setPermissions(); 		
+					
 		}
 		catch (InterruptedException e)
 		{
@@ -155,10 +152,13 @@ public class SensorProfiler extends Thread implements Runnable {
         	
         	editor.putBoolean("battery", false);
         	editor.putBoolean("batteryLevel", false);
-        	editor.putBoolean("battertTemperature", false);
+        	editor.putBoolean("batteryTemperature", false);
         	
         	editor.putBoolean("gps", false);
+        	editor.putBoolean("gpsPosition", false);
+        	
         	editor.putBoolean("wifi", false);
+        	editor.putBoolean("wifiBSSID", false);
            	
         	editor.commit();
 	    }
@@ -168,8 +168,10 @@ public class SensorProfiler extends Thread implements Runnable {
         batteryLevelEnabled = pref.getBoolean("batteryLevel", false);
         batteryTemperatureEnabled = pref.getBoolean("batteryTemperature", false);
 	    gpsEnabled = pref.getBoolean("gps", false);
+	    gpsPositionEnabled = pref.getBoolean("gpsPosition", false);
 	    wifiEnabled = pref.getBoolean("wifi", false);
-	   	
+	   	wifiBSSIDEnabled = pref.getBoolean("wifiBSSID", false);
+	    
 	    if( batteryEnabled )
 	    {
 	    	if( batteryLevelEnabled )
@@ -185,12 +187,18 @@ public class SensorProfiler extends Thread implements Runnable {
 	   	
 	    if( gpsEnabled )
 	    {
-	    	permissions.add("gps");
+	    	if( gpsPositionEnabled )
+	    	{
+	    		permissions.add("gpsPosition");
+	    	}
 	    }
 	    	
 	    if( wifiEnabled )
 	    {
-	    	permissions.add("wifi");
+	    	if( wifiBSSIDEnabled )
+	    	{
+	    		permissions.add("wifiBSSID");
+	    	}
 	    }				
 	}
 	
@@ -224,6 +232,8 @@ public class SensorProfiler extends Thread implements Runnable {
 	    // always available
 	    listSensorType.add("batteryLevel");
 	    listSensorType.add("batteryTemperature");
+	    listSensorType.add("gpsPosition");
+	    listSensorType.add("wifiBSSID");
 	    
 	    return listSensorType;
 	}
@@ -246,6 +256,13 @@ public class SensorProfiler extends Thread implements Runnable {
 		{
 			sendThreadMessage("internet_status:no_internet");
 		}
+	}
+	
+	public void sensorsPermissionsChanged()
+	{
+		getPermissions();
+		setPermissions();
+	//	communication.registerSmartphone(phoneProfiler.getPhoneId(), this.sensorRules);
 	}
 	
 	public void sendThreadMessage(String message)

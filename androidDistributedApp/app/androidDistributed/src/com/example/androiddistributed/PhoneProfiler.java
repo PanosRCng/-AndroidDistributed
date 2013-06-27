@@ -1,18 +1,20 @@
 package com.example.androiddistributed;
 
-import java.security.MessageDigest;
-
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Handler;
-import android.telephony.TelephonyManager;
+import android.os.Message;
 import android.util.Log;
 
 public class PhoneProfiler extends Thread implements Runnable {
 
 	private Handler handler;
 	private Context context;
+	private SharedPreferences pref;
+	private Editor editor;
 	
-	private final String PHONE_ID;
+	private int PHONE_ID;
 
 	// get TAG name for reporting to LogCat
 	private final String TAG = this.getClass().getSimpleName();
@@ -22,7 +24,15 @@ public class PhoneProfiler extends Thread implements Runnable {
 		this.handler = handler;
 		this.context = context;
 		
-		this.PHONE_ID = createPhoneId();
+		this.PHONE_ID = 0;
+		
+        pref = context.getApplicationContext().getSharedPreferences("phoneId", 0);
+        editor = pref.edit();
+		
+        if( (pref.contains("phoneId")) )
+        {
+        	this.PHONE_ID = pref.getInt("phoneId", 0);
+        }        
 	}
 	
 	public void run()
@@ -38,38 +48,25 @@ public class PhoneProfiler extends Thread implements Runnable {
 		}
 	}
 	
-	public String getPhoneId()
+	public int getPhoneId()
 	{		
 		return this.PHONE_ID;
 	}
 	
-	private String createPhoneId()
+	public void setPhoneId(int PHONE_ID)
 	{
-		String phoneId = "";
-			
-		String imei = getIMEI();
-			
-		try
-		{
-			MessageDigest md = MessageDigest.getInstance("SHA-256");
-				
-			md.update(imei.getBytes("UTF-8")); // Change this to "UTF-16" if needed
-			byte[] digest = md.digest();
-			phoneId = new String(digest, "UTF8");
-		}
-		catch(Exception e)
-		{
-			Log.e("TAG", e.toString());
-		}
-					
-		return phoneId;
+		this.PHONE_ID = PHONE_ID;
+		editor.putInt("phoneId", this.PHONE_ID);
+		editor.commit();
+		
+		sendThreadMessage("phoneId:"+PHONE_ID);
 	}
 	
-	private String getIMEI()
+	public void sendThreadMessage(String message)
 	{
-		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-		String imei = tm.getDeviceId();
-		
-		return imei;
+		Message msg = new Message();
+		msg.obj = message;
+		handler.sendMessage(msg);
 	}
+		
 }

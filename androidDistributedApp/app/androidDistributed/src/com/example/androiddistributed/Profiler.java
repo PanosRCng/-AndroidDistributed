@@ -9,7 +9,7 @@ public class Profiler extends Thread implements Runnable {
 	private Handler handler;
 	private PhoneProfiler phoneProfiler;
 	
-	private String PHONE_ID="";
+	private int PHONE_ID=0;
 	
 	// get TAG name for reporting to LogCat
 	private final String TAG = this.getClass().getSimpleName();

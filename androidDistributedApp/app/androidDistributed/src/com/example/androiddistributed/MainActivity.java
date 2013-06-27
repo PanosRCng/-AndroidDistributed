@@ -292,7 +292,7 @@ public class MainActivity extends TabActivity {
     			rTab.setInternetStatus(internet_status);	
     			pTab.setInternetStatus(internet_status); 	
             }
-            else if( intent.getAction().equals("job_report") )
+            else if( intent.getAction().equals("report_job") )
             {
             	String jobName = intent.getExtras().getString("value");
     			rTab.jobToReport(jobName);
