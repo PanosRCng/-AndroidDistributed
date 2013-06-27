@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Add Plugin
-Bundle-SymbolicName: org.ambientdynamix.contextplugins.addplugin
+Bundle-Name: MyExperiment
+Bundle-SymbolicName: org.ambientdynamix.contextplugins.myExperimentPlugin
 Bundle-Version: 9.47.1
 Bundle-ClassPath: .,lib/org.ambientdynamix.contextplugin.api_v0.9.47.j
  ar
