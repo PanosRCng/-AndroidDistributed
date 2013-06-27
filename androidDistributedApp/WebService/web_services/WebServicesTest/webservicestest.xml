@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="webservicestest" default="all">
+  
+  
+  <property file="webservicestest.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="128m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.war"/>
+    <include name="*.ear"/>
+    <include name="*.apk"/>
+    <include name="*.zip"/>
+    <include name="*.swc"/>
+    <include name="*.ane"/>
+    <include name="*.egg"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <include name="**/*?.class"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.6" value="${jdk.home.1.6}/bin"/>
+  <path id="jdk.classpath.1.6">
+    <fileset dir="${jdk.home.1.6}">
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/resources.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/javaws.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/rt.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/deploy.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/jsse.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/management-agent.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/charsets.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/plugin.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/jce.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/ext/localedata.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/ext/dnsns.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/ext/sunpkcs11.jar"/>
+      <include name="../../usr/lib/jvm/sun-jdk-1.6/jre/lib/ext/sunjce_provider.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value="${jdk.home.1.6}"/>
+  <property name="project.jdk.bin" value="${jdk.bin.1.6}"/>
+  <property name="project.jdk.classpath" value="jdk.classpath.1.6"/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.gson-2.2.4.classpath">
+    <pathelement location="${basedir}/../../../../../Downloads/google-gson-2.2.4/gson-2.2.4.jar"/>
+  </path>
+  
+  <path id="library.hibernate-4.2.2.classpath">
+    <pathelement location="${basedir}/lib/antlr-2.7.7.jar"/>
+    <pathelement location="${basedir}/lib/dom4j-1.6.1.jar"/>
+    <pathelement location="${basedir}/lib/hibernate-commons-annotations-4.0.2.Final.jar"/>
+    <pathelement location="${basedir}/lib/hibernate-core-4.2.2.Final.jar"/>
+    <pathelement location="${basedir}/lib/hibernate-jpa-2.0-api-1.0.1.Final.jar"/>
+    <pathelement location="${basedir}/lib/javassist-3.15.0-GA.jar"/>
+    <pathelement location="${basedir}/lib/jboss-logging-3.1.0.GA.jar"/>
+    <pathelement location="${basedir}/lib/jboss-transaction-api_1.1_spec-1.0.1.Final.jar"/>
+  </path>
+  
+  <path id="library.jax-ws-glassfish_/_jax-ws_2.2_ri_/_metro_1.x_/_jwsdp_2.2.classpath">
+    <pathelement location="${basedir}/lib/FastInoset.jar"/>
+    <pathelement location="${basedir}/lib/gmbal-api-only.jar"/>
+    <pathelement location="${basedir}/lib/ha-api.jar"/>
+    <pathelement location="${basedir}/lib/javax.annotation.jar"/>
+    <pathelement location="${basedir}/lib/jaxb-api.jar"/>
+    <pathelement location="${basedir}/lib/jaxb-impl.jar"/>
+    <pathelement location="${basedir}/lib/jaxb-xjc.jar"/>
+    <pathelement location="${basedir}/lib/jaxws-api.jar"/>
+    <pathelement location="${basedir}/lib/jaxws-rt.jar"/>
+    <pathelement location="${basedir}/lib/jaxws-tools.jar"/>
+    <pathelement location="${basedir}/lib/jsr181-api.jar"/>
+    <pathelement location="${basedir}/lib/mail.jar"/>
+    <pathelement location="${basedir}/lib/management-api.jar"/>
+    <pathelement location="${basedir}/lib/mimepull.jar"/>
+    <pathelement location="${basedir}/lib/policy.jar"/>
+    <pathelement location="${basedir}/lib/saaj-api.jar"/>
+    <pathelement location="${basedir}/lib/saaj-impl.jar"/>
+    <pathelement location="${basedir}/lib/stax-ex.jar"/>
+    <pathelement location="${basedir}/lib/stax2-api.jar"/>
+    <pathelement location="${basedir}/lib/streambuffer.jar"/>
+    <pathelement location="${basedir}/lib/woodstox-core-asl.jar"/>
+  </path>
+  
+  <path id="library.mysql-connector-java-5.1.25-bin.classpath">
+    <pathelement location="${basedir}/../../../../../Downloads/mysql-connector-java-5.1.25/mysql-connector-java-5.1.25-bin.jar"/>
+  </path>
+  
+  
+  <!-- Application Server Libraries -->
+  <!-- Register Custom Compiler Taskdefs -->
+  <property name="javac2.home" value="${idea.home}/lib"/>
+  <path id="javac2.classpath">
+    <pathelement location="${javac2.home}/javac2.jar"/>
+    <pathelement location="${javac2.home}/jdom.jar"/>
+    <pathelement location="${javac2.home}/asm4-all.jar"/>
+    <pathelement location="${javac2.home}/jgoodies-forms.jar"/>
+  </path>
+  <target name="register.custom.compilers">
+    <taskdef name="javac2" classname="com.intellij.ant.Javac2" classpathref="javac2.classpath"/>
+    <taskdef name="instrumentIdeaExtensions" classname="com.intellij.ant.InstrumentIdeaExtensions" classpathref="javac2.classpath"/>
+  </target>
+  
+  <!-- Modules -->
+  
+  <import file="${basedir}/module_webservicestest.xml"/>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.webservicestest, clean.artifact.webservicestest:war_exploded" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.webservicestest" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.webservicestest:war_exploded" value="${basedir}/out/artifacts/WebServicesTest_war_exploded"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="clean.artifact.webservicestest:war_exploded" description="clean WebServicesTest:war exploded artifact output">
+    <delete dir="${artifact.output.webservicestest:war_exploded}"/>
+  </target>
+  
+  <target name="artifact.webservicestest:war_exploded" depends="init.artifacts, compile.module.webservicestest" description="Build &#39;WebServicesTest:war exploded&#39; artifact">
+    <mkdir dir="${artifact.output.webservicestest:war_exploded}"/>
+    <mkdir dir="${artifact.output.webservicestest:war_exploded}/WEB-INF"/>
+    <mkdir dir="${artifact.output.webservicestest:war_exploded}/WEB-INF/classes"/>
+    <copy todir="${artifact.output.webservicestest:war_exploded}/WEB-INF/classes">
+      <fileset dir="${webservicestest.output.dir}"/>
+    </copy>
+    <mkdir dir="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib"/>
+    <copy file="${basedir}/lib/FastInoset.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/FastInoset.jar"/>
+    <copy file="${basedir}/lib/gmbal-api-only.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/gmbal-api-only.jar"/>
+    <copy file="${basedir}/lib/ha-api.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/ha-api.jar"/>
+    <copy file="${basedir}/lib/javax.annotation.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/javax.annotation.jar"/>
+    <copy file="${basedir}/lib/jaxb-api.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jaxb-api.jar"/>
+    <copy file="${basedir}/lib/jaxb-impl.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jaxb-impl.jar"/>
+    <copy file="${basedir}/lib/jaxb-xjc.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jaxb-xjc.jar"/>
+    <copy file="${basedir}/lib/jaxws-api.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jaxws-api.jar"/>
+    <copy file="${basedir}/lib/jaxws-rt.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jaxws-rt.jar"/>
+    <copy file="${basedir}/lib/jaxws-tools.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jaxws-tools.jar"/>
+    <copy file="${basedir}/lib/jsr181-api.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jsr181-api.jar"/>
+    <copy file="${basedir}/lib/mail.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/mail.jar"/>
+    <copy file="${basedir}/lib/management-api.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/management-api.jar"/>
+    <copy file="${basedir}/lib/mimepull.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/mimepull.jar"/>
+    <copy file="${basedir}/lib/policy.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/policy.jar"/>
+    <copy file="${basedir}/lib/saaj-api.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/saaj-api.jar"/>
+    <copy file="${basedir}/lib/saaj-impl.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/saaj-impl.jar"/>
+    <copy file="${basedir}/lib/stax2-api.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/stax2-api.jar"/>
+    <copy file="${basedir}/lib/stax-ex.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/stax-ex.jar"/>
+    <copy file="${basedir}/lib/streambuffer.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/streambuffer.jar"/>
+    <copy file="${basedir}/lib/woodstox-core-asl.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/woodstox-core-asl.jar"/>
+    <copy file="${basedir}/lib/hibernate-core-4.2.2.Final.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/hibernate-core-4.2.2.Final.jar"/>
+    <copy file="${basedir}/lib/hibernate-jpa-2.0-api-1.0.1.Final.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/hibernate-jpa-2.0-api-1.0.1.Final.jar"/>
+    <copy file="${basedir}/lib/hibernate-commons-annotations-4.0.2.Final.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/hibernate-commons-annotations-4.0.2.Final.jar"/>
+    <copy file="${basedir}/lib/antlr-2.7.7.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/antlr-2.7.7.jar"/>
+    <copy file="${basedir}/lib/dom4j-1.6.1.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/dom4j-1.6.1.jar"/>
+    <copy file="${basedir}/lib/javassist-3.15.0-GA.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/javassist-3.15.0-GA.jar"/>
+    <copy file="${basedir}/lib/jboss-logging-3.1.0.GA.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jboss-logging-3.1.0.GA.jar"/>
+    <copy file="${basedir}/lib/jboss-transaction-api_1.1_spec-1.0.1.Final.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/jboss-transaction-api_1.1_spec-1.0.1.Final.jar"/>
+    <copy file="${basedir}/../../../../../Downloads/mysql-connector-java-5.1.25/mysql-connector-java-5.1.25-bin.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/mysql-connector-java-5.1.25-bin.jar"/>
+    <copy file="${basedir}/../../../../../Downloads/google-gson-2.2.4/gson-2.2.4.jar" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/lib/gson-2.2.4.jar"/>
+    <copy todir="${artifact.output.webservicestest:war_exploded}">
+      <fileset dir="${basedir}/web"/>
+    </copy>
+    <mkdir dir="${artifact.output.webservicestest:war_exploded}/WEB-INF"/>
+    <copy file="${basedir}/web/WEB-INF/web.xml" tofile="${artifact.output.webservicestest:war_exploded}/WEB-INF/web.xml"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.webservicestest:war_exploded" description="Build all artifacts">
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>

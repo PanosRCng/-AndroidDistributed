@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="2.0">
+
+    <persistence-unit name="persistenceUnit">
+        <mapping-file>helloworld/Mappings.xml</mapping-file>
+        <class>helloworld.ExperimentsEntity</class>
+        <class>helloworld.SmartphonesEntity</class>
+        <class>helloworld.UsersEntity</class>
+        <class>helloworld.ResultsEntity</class>
+        <class>helloworld.PluginsEntity</class>
+        <properties>
+            <property name="openjpa.ConnectionURL" value="jdbc:mysql://localhost:3306/androidDistributed"/>
+            <property name="openjpa.ConnectionDriverName" value="com.mysql.jdbc.Driver"/>
+            <property name="openjpa.ConnectionUserName" value="root"/>
+            <property name="openjpa.ConnectionPassword" value="root"/>
+        </properties>
+    </persistence-unit>
+</persistence>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://helloworld/" xmlns:tns="http://helloworld/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="Hello" type="tns:Hello"/>
+
+  <xs:element name="HelloFoo" type="tns:HelloFoo"/>
+
+  <xs:element name="HelloFooResponse" type="tns:HelloFooResponse"/>
+
+  <xs:element name="HelloResponse" type="tns:HelloResponse"/>
+
+  <xs:complexType name="Hello">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HelloResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HelloFoo">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HelloFooResponse">
+    <xs:sequence>
+      <xs:element name="return" type="tns:foo" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="foo">
+    <xs:sequence>
+      <xs:element name="a" type="xs:string" minOccurs="0"/>
+      <xs:element name="b" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+

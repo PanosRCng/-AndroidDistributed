@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_webservicestest" default="compile.module.webservicestest">
+  <dirname property="module.webservicestest.basedir" file="${ant.file.module_webservicestest}"/>
+  
+  <property name="module.jdk.home.webservicestest" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.webservicestest" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.webservicestest" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.webservicestest" value="${compiler.args}"/>
+  
+  <property name="webservicestest.output.dir" value="${module.webservicestest.basedir}/out/production/WebServicesTest"/>
+  <property name="webservicestest.testoutput.dir" value="${module.webservicestest.basedir}/out/test/WebServicesTest"/>
+  
+  <path id="webservicestest.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="webservicestest.module.production.classpath">
+    <path refid="${module.jdk.classpath.webservicestest}"/>
+    <path refid="library.jax-ws-glassfish_/_jax-ws_2.2_ri_/_metro_1.x_/_jwsdp_2.2.classpath"/>
+    <path refid="library.hibernate-4.2.2.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.25-bin.classpath"/>
+    <path refid="library.gson-2.2.4.classpath"/>
+  </path>
+  
+  <path id="webservicestest.runtime.production.module.classpath">
+    <pathelement location="${webservicestest.output.dir}"/>
+    <path refid="library.jax-ws-glassfish_/_jax-ws_2.2_ri_/_metro_1.x_/_jwsdp_2.2.classpath"/>
+    <path refid="library.hibernate-4.2.2.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.25-bin.classpath"/>
+    <path refid="library.gson-2.2.4.classpath"/>
+  </path>
+  
+  <path id="webservicestest.module.classpath">
+    <path refid="${module.jdk.classpath.webservicestest}"/>
+    <pathelement location="${webservicestest.output.dir}"/>
+    <path refid="library.jax-ws-glassfish_/_jax-ws_2.2_ri_/_metro_1.x_/_jwsdp_2.2.classpath"/>
+    <path refid="library.hibernate-4.2.2.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.25-bin.classpath"/>
+    <path refid="library.gson-2.2.4.classpath"/>
+  </path>
+  
+  <path id="webservicestest.runtime.module.classpath">
+    <pathelement location="${webservicestest.testoutput.dir}"/>
+    <pathelement location="${webservicestest.output.dir}"/>
+    <path refid="library.jax-ws-glassfish_/_jax-ws_2.2_ri_/_metro_1.x_/_jwsdp_2.2.classpath"/>
+    <path refid="library.hibernate-4.2.2.classpath"/>
+    <path refid="library.mysql-connector-java-5.1.25-bin.classpath"/>
+    <path refid="library.gson-2.2.4.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.webservicestest">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.webservicestest">
+    <patternset refid="excluded.from.module.webservicestest"/>
+  </patternset>
+  
+  <path id="webservicestest.module.sourcepath">
+    <dirset dir="${module.webservicestest.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.webservicestest" depends="compile.module.webservicestest.production,compile.module.webservicestest.tests" description="Compile module WebServicesTest"/>
+  
+  <target name="compile.module.webservicestest.production" depends="register.custom.compilers" description="Compile module WebServicesTest; production classes">
+    <mkdir dir="${webservicestest.output.dir}"/>
+    <javac2 destdir="${webservicestest.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.webservicestest}/javac">
+      <compilerarg line="${compiler.args.webservicestest}"/>
+      <bootclasspath refid="webservicestest.module.bootclasspath"/>
+      <classpath refid="webservicestest.module.production.classpath"/>
+      <src refid="webservicestest.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.webservicestest"/>
+    </javac2>
+    
+    <copy todir="${webservicestest.output.dir}">
+      <fileset dir="${module.webservicestest.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.webservicestest.tests" depends="register.custom.compilers,compile.module.webservicestest.production" description="compile module WebServicesTest; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.webservicestest" description="cleanup module">
+    <delete dir="${webservicestest.output.dir}"/>
+    <delete dir="${webservicestest.testoutput.dir}"/>
+  </target>
+</project>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+        version="2.0">
+    <entity class="helloworld.ExperimentsEntity">
+        <table name="experiments" schema="" catalog="androidDistributed"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+            </id>
+            <basic name="contextType">
+                <column name="contextType"/>
+            </basic>
+            <basic name="userEmail">
+                <column name="user_email"/>
+            </basic>
+            <basic name="name">
+                <column name="name"/>
+            </basic>
+            <basic name="sensorDependencies">
+                <column name="sensorDependencies"/>
+            </basic>
+            <basic name="timeDependencies">
+                <column name="timeDependencies"/>
+            </basic>
+            <basic name="expires">
+                <column name="expires"/>
+            </basic>
+            <basic name="status">
+                <column name="status"/>
+            </basic>
+            <basic name="url">
+                <column name="url"/>
+            </basic>
+            <basic name="executedBy">
+                <column name="executedBy"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="helloworld.PluginsEntity">
+        <table name="plugins" schema="" catalog="androidDistributed"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+            </id>
+            <basic name="pluginId">
+                <column name="plugin_id"/>
+            </basic>
+            <basic name="runtimeFactoryClass">
+                <column name="runtimeFactoryClass"/>
+            </basic>
+            <basic name="name">
+                <column name="name"/>
+            </basic>
+            <basic name="description">
+                <column name="description"/>
+            </basic>
+            <basic name="installUrl">
+                <column name="installUrl"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="helloworld.ResultsEntity">
+        <table name="results" schema="" catalog="androidDistributed"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+            </id>
+            <basic name="experimentId">
+                <column name="experiment_id"/>
+            </basic>
+            <basic name="sourceId">
+                <column name="source_id"/>
+            </basic>
+            <basic name="value">
+                <column name="value"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="helloworld.SmartphonesEntity">
+        <table name="smartphones" schema="" catalog="androidDistributed"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+            </id>
+            <basic name="phoneId">
+                <column name="phone_id"/>
+            </basic>
+            <basic name="sensorsRules">
+                <column name="sensors_rules"/>
+            </basic>
+            <basic name="timeRules">
+                <column name="time_rules"/>
+            </basic>
+        </attributes>
+    </entity>
+    <entity class="helloworld.UsersEntity">
+        <table name="users" schema="" catalog="androidDistributed"/>
+        <attributes>
+            <id name="id">
+                <column name="id"/>
+            </id>
+            <basic name="firstname">
+                <column name="firstname"/>
+            </basic>
+            <basic name="lastname">
+                <column name="lastname"/>
+            </basic>
+            <basic name="username">
+                <column name="username"/>
+            </basic>
+            <basic name="password">
+                <column name="password"/>
+            </basic>
+            <basic name="email">
+                <column name="email"/>
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>
