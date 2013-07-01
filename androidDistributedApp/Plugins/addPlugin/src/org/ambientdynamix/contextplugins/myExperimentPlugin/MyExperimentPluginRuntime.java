@@ -1,7 +1,10 @@
 package org.ambientdynamix.contextplugins.myExperimentPlugin;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.ambientdynamix.api.application.ErrorCodes;
@@ -11,7 +14,10 @@ import org.ambientdynamix.api.contextplugin.PowerScheme;
 import org.ambientdynamix.api.contextplugin.security.PrivacyRiskLevel;
 import org.ambientdynamix.api.contextplugin.security.SecuredContextInfo;
 
+import com.google.gson.Gson;
+
 import android.content.Context;
+import android.net.wifi.ScanResult;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -22,24 +28,26 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 	private final String TAG = this.getClass().getSimpleName();
 	// Our secure context
 	private Context context;
-
-//	private ArrayList<String> dependencies;
 	
 	List<String> dependencies = new ArrayList<String>()
 	{
 		{
-			add("org.ambientdynamix.contextplugins.WifiPlugin");
+			add("org.ambientdynamix.contextplugins.WifiScanPlugin");
+			add("org.ambientdynamix.contextplugins.GpsPlugin");
 		}
 	};	
 	
 	public static String CONTEXT_TYPE = "org.ambientdynamix.contextplugins.myExperimentPlugin";
 	
-	private String dependency1 = "org.ambientdynamix.contextplugins.WifiPlugin";
+	private String dependency1 = "org.ambientdynamix.contextplugins.WifiScanPlugin";
+	private String dependency2 = "org.ambientdynamix.contextplugins.GpsPlugin";
 	
-	private int samples = 10;
+	private int samples = 2;
 	private int sample_counter = 0;
 	
-	private String bssid = "-1";
+	private Map<String, String> wifiMap;
+	private String scanJson = "-1";
+	private String position = "-1";
 	private Bundle results;
 	
 	private String state;
@@ -53,7 +61,7 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 			if(running)
 			{	
 				doJob();
-				handler.postDelayed(this, 20000);
+				handler.postDelayed(this, 200000);
 			}
 		}
 	};
@@ -66,6 +74,10 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 		this.context = this.getSecuredContext();
 		
 		results = new Bundle();
+		
+		wifiMap = new HashMap<String, String>();
+		scanJson = "-1";
+		position = "-1";
 		
 		state = "not_ready";
 		handler = new Handler();
@@ -101,7 +113,29 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 		}
 		else if( command.equals(dependency1) )
 		{
-			bssid = config.getString("data");
+			scanJson = config.getString("data");
+			
+			Gson gson = new Gson();
+			Scan scan = gson.fromJson(scanJson, Scan.class);
+			
+			List<ScanResult> wifiList = scan.getWifiList();
+		    
+			for(int i = 0; i < wifiList.size(); i++)
+			{
+				String BSSID = wifiList.get(i).BSSID;
+				String capabilities = wifiList.get(i).capabilities;
+				String SSID = wifiList.get(i).SSID;
+				int frequency = wifiList.get(i).frequency;
+				int level = wifiList.get(i).level;
+
+				String line = BSSID + "\t" + position +  "\t" + capabilities + "\t" + SSID + "\t" + frequency + "\t" + level;
+				wifiMap.put(BSSID, line);
+			}		
+
+		}
+		else if( command.equals(dependency2) )
+		{
+			position = config.getString("data");	
 		}
 		else if( command.equals("start") )
 		{
@@ -164,16 +198,30 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 	{
 		running = true;
 		setState("running");
-		handler.postDelayed(runnable, 20000);
+		handler.postDelayed(runnable, 200000);
 	}
 	
 	private void doJob()
 	{
 		Log.i(TAG, "doing happy job");
-				
-		long currentTime = System.currentTimeMillis();			
-		results.putString(Long.toString(currentTime), bssid);
 		
+	    Iterator it = wifiMap.entrySet().iterator();
+	    
+	    while (it.hasNext())
+	    {
+	        Map.Entry pairs = (Map.Entry)it.next();
+	        
+	        String BSSID = (String) pairs.getKey();
+	        String line = (String) pairs.getValue();
+	        
+			long currentTime = System.currentTimeMillis();			
+			results.putString(Long.toString(currentTime), line);   
+	        
+	        it.remove(); 
+	    }
+		
+	    wifiMap.clear();
+	    
 		sample_counter++;
 		if(sample_counter >= samples)
 		{
