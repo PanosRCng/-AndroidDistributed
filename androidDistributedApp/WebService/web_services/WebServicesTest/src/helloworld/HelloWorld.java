@@ -80,14 +80,15 @@ public class HelloWorld {
         Gson gson = new Gson();
         Smartphone smartphone = gson.fromJson(smartphoneJson, Smartphone.class);
         int phoneId = smartphone.getPhoneId();
+        String smartphoneSensorRules = smartphone.getSensorsRules();
 
         Configuration conf = new Configuration().configure();
         SessionFactory factory = conf.buildSessionFactory();
         Session session = factory.openSession();
         Transaction tx = session.beginTransaction();
 
-        SmartphonesEntity smartphoneEntity = new SmartphonesEntity();
-        smartphoneEntity.setPhoneId(phoneId);
+//        SmartphonesEntity smartphoneEntity = new SmartphonesEntity();
+//        smartphoneEntity.setPhoneId(phoneId);
 
         String hql = "from SmartphonesEntity where phoneId=?";
         List<SmartphonesEntity> recordList= session.createQuery(hql).setInteger(0, phoneId).list();
@@ -97,7 +98,10 @@ public class HelloWorld {
         if( recordList.size() > 0 )
         {
             SmartphonesEntity my_smartphone = recordList.get(0);
-            String smartphoneSensorRules = my_smartphone.getSensorsRules();
+            my_smartphone.setSensorsRules(smartphoneSensorRules);
+            session.update(my_smartphone);
+
+            //         String smartphoneSensorRules = my_smartphone.getSensorsRules();
             String smarDep = smartphoneSensorRules;
             String[] smarDeps = smartphoneSensorRules.split("|");
 
@@ -136,6 +140,8 @@ public class HelloWorld {
                     }
                 }
             }
+
+            tx.commit();
         }
         else
         {
