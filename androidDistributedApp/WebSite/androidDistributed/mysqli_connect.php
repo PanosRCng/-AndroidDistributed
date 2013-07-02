@@ -1,8 +1,8 @@
 <?php
 
-DEFINE ('DB_USER', 'root');
-DEFINE ('DB_PASSWORD', 'F3J2H4J7PT~$#XZX^bbVdf=Zeg]{');
-DEFINE ('DB_HOST', 'localhost');
+DEFINE ('DB_USER', '**********');
+DEFINE ('DB_PASSWORD', '*********');
+DEFINE ('DB_HOST', '************');
 DEFINE ('DB_NAME', 'androidDistributed');
 
 $dbc = @mysqli_connect (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
