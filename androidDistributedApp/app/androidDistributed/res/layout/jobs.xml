@@ -12,10 +12,9 @@
         <TextView
             android:id="@+id/TextView01"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="5dp"
-            android:text="Job Scheduled"
+            android:text="job Scheduled"
             android:textColor="#36ACF5"
             android:textSize="15sp" />
 
@@ -34,7 +33,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:layout_gravity="bottom"
-                android:layout_margin="10dp"
+                android:layout_margin="5dp"
                 android:orientation="vertical" >
 
                 <TextView
@@ -42,7 +41,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:text="Job Name: "
+                    android:text="no job running"
+                    android:textColor="#FFBE0D"
                     android:textSize="20sp" />
 
                 <TextView
@@ -50,27 +50,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
-                    android:text="Description: "
+                    android:textColor="#FFFFFF" 
+                    android:text=""
                     android:textSize="15dp" />
 
             </LinearLayout>
 
         </LinearLayout>
-
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="#7F7E85" />
-
-        <TextView
-            android:id="@+id/TextView02"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="5dp"
-            android:text="control job"
-            android:textColor="#36ACF5"
-            android:textSize="15sp" />
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -78,10 +64,15 @@
             android:layout_gravity="center"
             android:orientation="horizontal" >
 
+            <View
+                android:layout_height="fill_parent"
+  				android:layout_width="100dp">
+			</View>
+            
             <ImageView
                 android:id="@+id/imageView2"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
                 android:onClick="startJob"
@@ -89,20 +80,20 @@
             
             <ImageView
                 android:id="@+id/imageView3"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="center"
-                android:layout_margin="5dp"
-                android:src="@drawable/pause" />
-            
-            <ImageView
-                android:id="@+id/imageView4"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
                 android:layout_gravity="center"
                 android:layout_margin="5dp"
                 android:onClick="stopJob"
                 android:src="@drawable/stop" />
+            
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:src="@drawable/cancel" />
 
         </LinearLayout>
 
@@ -114,7 +105,7 @@
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
-            android:layout_height="30dp"
+            android:layout_height="22dp"
             android:layout_gravity="center"
             android:layout_margin="5dp"
             android:text="job dependencies"

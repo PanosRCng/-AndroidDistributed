@@ -2,6 +2,9 @@ package com.example.androiddistributed;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,6 +18,8 @@ import org.ambientdynamix.api.application.IContextInfo;
 import org.ambientdynamix.api.application.IDynamixFacade;
 import org.ambientdynamix.api.application.IDynamixListener;
 import org.ambientdynamix.api.application.Result;
+import org.ambientdynamix.contextplugins.WifiPlugin.IWifiPluginInfo;
+import org.ambientdynamix.contextplugins.myExperimentPlugin.IExperimentPluginInfo;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
@@ -28,6 +33,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -50,11 +57,15 @@ public class Scheduler extends Thread implements Runnable {
 	public Job currentJob;
 	private int resultCounter;
 	
+	private SharedPreferences pref;
+	private Editor editor;
+	
 	Stack jobs;
+	Stack msgs;
     Map<String, Boolean> sensorsPermissions;
 	
     private boolean free_to_commit = true;
-	
+    
     // scheduler constructor
 	public Scheduler(Handler handler, Context context, SensorProfiler sensorProfiler, Reporter reporter, PhoneProfiler phoneProfiler)
 	{
@@ -66,6 +77,10 @@ public class Scheduler extends Thread implements Runnable {
 		
 		currentJob = new Job();
 		jobs = new Stack();
+		msgs = new Stack();
+		
+        pref = context.getApplicationContext().getSharedPreferences("runningJob", 0); // 0 - for private mode
+        editor = pref.edit();
 		
 		// get list of permissions about the available sensors
 		sensorsPermissions = sensorProfiler.getSensorsPermissions();
@@ -99,8 +114,7 @@ public class Scheduler extends Thread implements Runnable {
 				if (!dynamix.isSessionOpen())
 				{
 					Log.i(TAG, "Dynamix connected... trying to open session\n");
-					dynamix.openSession();
-					
+					dynamix.openSession();					
 				}
 				else
 				{
@@ -194,11 +208,11 @@ public class Scheduler extends Thread implements Runnable {
 
 		@Override
 		public void onContextEvent(ContextEvent event) throws RemoteException
-		{					
+		{			
 			if (event.hasIContextInfo())
 			{	
-			IContextInfo nativeInfo = event.getIContextInfo();
-			currentJob.getMsg(nativeInfo);
+				IContextInfo nativeInfo = event.getIContextInfo();
+				currentJob.getMsg(nativeInfo);
 			}
 		}
 		
@@ -341,8 +355,9 @@ public class Scheduler extends Thread implements Runnable {
 	
 	// call to synamix commit a job plugin to dynamix framework
 	public void commitJob(String contextType)
-	{
+	{		
 		currentJob = new Job(contextType, this);
+		
 		resultCounter=0;
 		
 		jobs.push(contextType);
@@ -592,16 +607,18 @@ public class Scheduler extends Thread implements Runnable {
 		catch(Exception e)
 		{
 			Log.e(TAG, e.toString());
-		}		
+		}
+		
+		// finished or stopped
+		sendThreadMessage("report_job:" + currentJob.getContextType());
 	}
 	
 	public void reportJob(String jobId)
 	{
 		reporter.report(jobId);
-		sendThreadMessage("report_job:" + jobId);
 		
 		stopCurrentPlugin();
-		currentJob = null;
+		currentJob = new Job();
 	}
 	
 	public void sendThreadMessage(String message)
@@ -612,20 +629,38 @@ public class Scheduler extends Thread implements Runnable {
 	}
 	
 	public void stopCurrentPlugin()
-	{				
-		currentJob.stopJob();
+	{			
+		if(currentJob.jobState!=null)
+		{
+			currentJob.stopJob();
+		}
+	}
+	
+	public void calcelCurrentJob()
+	{
+		currentJob.setState("finished");
+		currentJob = new Job();
+	
+		editor.putString("runningJob", "-1");
+		editor.putString("runningExperimentUrl", "-1");
+		editor.commit();
+		
+		sendThreadMessage("job_name:" + "no job running");
 	}
 	
 	public void startCurrentJob()
 	{
-		currentJob.setState("not_ready");		
-		try
+		if(currentJob.jobState != null)
 		{
-			summonPlugin(currentJob.getContextType());
-		}
-		catch(Exception e)
-		{
-			Log.e(TAG, e.toString());
+			currentJob.setState("not_ready");	
+			try
+			{
+				summonPlugin(currentJob.getContextType());
+			}
+			catch(Exception e)
+			{
+				Log.e(TAG, e.toString());
+			}
 		}
 	}
 	

@@ -117,6 +117,8 @@ public class Communication extends Thread implements Runnable {
 	
 	public int registerSmartphone(int phoneId, String sensorsRules)
 	{
+		int serverPhoneId = 0;
+		
 		Smartphone smartphone = new Smartphone(phoneId);
 		smartphone.setSensorsRules(sensorsRules);
 		smartphone.setTimeRules("time_rules");
@@ -124,9 +126,18 @@ public class Communication extends Thread implements Runnable {
 		Gson gson = new Gson();
 		String jsonSmartphone = gson.toJson(smartphone);
 		
-		String serverPhoneId = sendRegisterSmartphone(jsonSmartphone);
+		String serverPhoneId_s = sendRegisterSmartphone(jsonSmartphone);
 		
-		return Integer.parseInt(serverPhoneId);
+		try
+		{
+			serverPhoneId = Integer.parseInt(serverPhoneId_s);
+		}
+		catch(Exception e)
+		{
+			serverPhoneId = -1;
+		}
+		
+		return serverPhoneId;
 	}
 	
 	private String sendRegisterSmartphone(String jsonSmartphone)
@@ -190,9 +201,10 @@ public class Communication extends Thread implements Runnable {
 		return serverPhoneId;
 	}
 	
-	public String getExperiment(int phoneId)
+	public String getExperiment(int phoneId, String sensorRules)
 	{
 		Smartphone smartphone = new Smartphone(phoneId);		
+		smartphone.setSensorsRules(sensorRules);
 		Gson gson = new Gson();
 		String jsonSmartphone = gson.toJson(smartphone);
 		return sendGetExperiment(jsonSmartphone);

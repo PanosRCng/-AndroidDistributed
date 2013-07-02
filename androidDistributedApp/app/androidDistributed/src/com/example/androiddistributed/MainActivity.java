@@ -164,6 +164,7 @@ public class MainActivity extends TabActivity {
 			registerReceiver(serviceIntentlistener, new IntentFilter("jobDependencies"));
 			registerReceiver(serviceIntentlistener, new IntentFilter("internet_status"));
 			registerReceiver(serviceIntentlistener, new IntentFilter("job_report"));
+			registerReceiver(serviceIntentlistener, new IntentFilter("job_name"));			
 			
 			serviceIntentListenerIsRegistered = true;
 		} 
@@ -292,11 +293,16 @@ public class MainActivity extends TabActivity {
     			rTab.setInternetStatus(internet_status);	
     			pTab.setInternetStatus(internet_status); 	
             }
-            else if( intent.getAction().equals("report_job") )
+            else if( intent.getAction().equals("job_report") )
             {
             	String jobName = intent.getExtras().getString("value");
     			rTab.jobToReport(jobName);
-            }           
+            }
+            else if( intent.getAction().equals("job_name") )
+            {
+            	String jobName = intent.getExtras().getString("value");
+    			jTab.commitJob(jobName);
+            }  
         }
     }  
     

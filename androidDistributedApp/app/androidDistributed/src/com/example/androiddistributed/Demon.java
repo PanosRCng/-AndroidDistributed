@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -22,6 +24,11 @@ public class Demon extends Thread implements Runnable {
 	private Communication communication;
 	private SensorProfiler sensorProfiler;
 	
+	private SharedPreferences pref;
+	private Editor editor;
+	String runningJob = "-1";
+	String lastRunned = "-1";
+	
 	// get TAG name for reporting to LogCat
 	private final String TAG = this.getClass().getSimpleName();
 	
@@ -33,6 +40,12 @@ public class Demon extends Thread implements Runnable {
 		this.phoneProfiler = phoneProfiler;
 		this.communication = communication;
 		this.sensorProfiler = sensorProfiler;
+		
+        pref = context.getApplicationContext().getSharedPreferences("runningJob", 0); // 0 - for private mode
+        editor = pref.edit();
+        
+        runningJob = pref.getString("runningJob", "-1");
+        lastRunned = pref.getString("lastExperiment", "-1");
 	}
 	
 	public void run()
@@ -54,18 +67,46 @@ public class Demon extends Thread implements Runnable {
 			checkFile("plugs.xml");
 		    checkFile("org.ambientdynamix.contextplugins.batteryLevelPlugin_9.47.1.jar");
 			checkFile("org.ambientdynamix.contextplugins.batteryTemperaturePlugin_9.47.1.jar");
-			checkFile("org.ambientdynamix.contextplugins.gpsplugin_9.47.1.jar");
-			checkFile("org.ambientdynamix.contextplugins.WifiPlugin_9.47.1.jar");
+			checkFile("org.ambientdynamix.contextplugins.GpsPlugin_9.47.1.jar");
+			checkFile("org.ambientdynamix.contextplugins.WifiScanPlugin_9.47.1.jar");
+			
+			handler.postDelayed(runnable, 10000);
 			
 			// tell to dynamix Framework to update its repository
-			updateDynamixRepository();
-				
+	//		updateDynamixRepository();
+								
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private Runnable runnable = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			pingExperiment();
+			handler.postDelayed(this, 20000);
+		}
+	};
+	
+	private void pingExperiment()
+	{		
+        runningJob = pref.getString("runningJob", "-1");
+        lastRunned = pref.getString("lastExperiment", "-1");
+        
+		Log.i("running job", runningJob);
+		
+		if( runningJob.equals("-1") )
+		{		
 			if( communication.ping() )
 			{
-				String jsonExperiment = communication.getExperiment( phoneProfiler.getPhoneId() );
-					
+				String jsonExperiment = communication.getExperiment( phoneProfiler.getPhoneId(), sensorProfiler.getSensorRules() );
+			
 				Log.i(TAG, jsonExperiment);
-					
+			
 				if(jsonExperiment.equals("0"))
 				{
 					Log.i(TAG, "no experiment for us");
@@ -73,43 +114,58 @@ public class Demon extends Thread implements Runnable {
 				else
 				{
 					Gson gson = new Gson();
-			       	Experiment experiment = gson.fromJson(jsonExperiment, Experiment.class);				
+					Experiment experiment = gson.fromJson(jsonExperiment, Experiment.class);				
 
-			       	if( experiment.getContextType().equals( scheduler.currentJob.getContextType() ) )
-			       	{
-			       		Log.i(TAG, "i already have this experiment, do not downloading it");
-			       	}
-			       	else 
-			       	{
-			            String[] smarDeps = sensorProfiler.getSensorRules().split("|");
-			            String[] expDeps = experiment.getSensorDependencies().split("|");
-			       		
-			            Set<String> smarSet = new HashSet<String>(Arrays.asList(smarDeps));
-			            Set<String> expSet = new HashSet<String>(Arrays.asList(expDeps));
+					String[] smarDeps = sensorProfiler.getSensorRules().split("|");
+					String[] expDeps = experiment.getSensorDependencies().split("|");
+	       		
+					Set<String> smarSet = new HashSet<String>(Arrays.asList(smarDeps));
+					Set<String> expSet = new HashSet<String>(Arrays.asList(expDeps));
 
-	                    if( smarSet.equals(expSet) )
-	                    {
-			       			String contextType = experiment.getContextType();
-			       			String url = experiment.getUrl();
+					if( smarSet.equals(expSet) )
+					{
+						String contextType = experiment.getContextType();
+						String url = experiment.getUrl();
 
-			     	 		Downloader downloader = new Downloader();
-			       	 		downloader.DownloadFromUrl(url, contextType+"_9.47.1.jar");
-			        	
-			       	 		scheduler.commitJob(contextType);
-			       	 		
-			        	}
-			        	else
-			        	{
-			        		Log.i(TAG, "this experiment violates my sensor rules");
-			        	}
-			        }
+				//		if( lastRunned.equals(contextType) )
+				//		{
+				//			return;
+				//		}
+						
+						Downloader downloader = new Downloader();
+	       	 			downloader.DownloadFromUrl(url, contextType+"_9.47.1.jar");
+	        			
+	       	 			editor.putString("runningJob", contextType);
+	       	 			editor.putString("runningExperimentUrl", experiment.getUrl());
+	       	 			editor.commit();
+	       	 			
+	       	 			sendThreadMessage("job_name:"+experiment.getName());
+	       	 			
+	       	 			scheduler.commitJob(contextType);	
+					}
+					else
+					{
+						Log.i(TAG, "this experiment violates my sensor rules");
+					}
 				}
 			}
-				
+			else
+			{
+				Log.i("WTF", "no ping for us");
+			}
 		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
+		else
+		{	
+			if(scheduler.currentJob.jobState == null)
+			{
+				String runningExperimentUrl = pref.getString("runningExperimentUrl", "-1");
+				checkExperiment(runningJob, runningExperimentUrl);
+			
+   	 			sendThreadMessage("job_name:"+runningJob);
+				
+				scheduler.commitJob(runningJob);
+			}
+
 		}
 	}
 	
@@ -122,6 +178,18 @@ public class Demon extends Thread implements Runnable {
 	    {	
 	    	Downloader downloader = new Downloader();
 	    	downloader.DownloadFromUrl("http://83.212.115.57/androidDistributed/dynamixRepository/"+myFile, myFile);
+	    }
+	}
+	
+	private void checkExperiment(String contextType, String url)
+	{		
+		File root = android.os.Environment.getExternalStorageDirectory();               
+	    File myfile = new File (root.getAbsolutePath() + "/dynamix/" + contextType + "_9.47.1.jar");
+
+	    if(myfile.exists()==false)
+	    {
+			Downloader downloader = new Downloader();
+			downloader.DownloadFromUrl(url, contextType+"_9.47.1.jar");
 	    }
 	}
 	

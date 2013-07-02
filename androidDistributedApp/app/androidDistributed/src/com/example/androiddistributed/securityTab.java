@@ -62,6 +62,7 @@ public class securityTab extends Activity{
         		}
         		
         		editor.commit();
+        		sendPermissionsChangedIntent();
         	}
     	});
         
@@ -81,6 +82,7 @@ public class securityTab extends Activity{
         		}
         		
         		editor.commit();
+        		sendPermissionsChangedIntent();
         	}
     	});
     	
@@ -100,6 +102,7 @@ public class securityTab extends Activity{
         		}
         		
         		editor.commit();
+        		sendPermissionsChangedIntent();
         	}
     	});
     	
@@ -119,6 +122,7 @@ public class securityTab extends Activity{
         		}
         		
         		editor.commit();
+        		sendPermissionsChangedIntent();
         	}
     	});
     	
@@ -242,11 +246,11 @@ public class securityTab extends Activity{
     {
     	if(!gpsEnabled)
     	{
-        	editor.putBoolean("gps", true);
-        	        	
+        	editor.putBoolean("gps", true); 
+    		
         	chkGpsPosition.setEnabled(true);
         	
-        	editor.putBoolean("gpsPosition", true);
+        	editor.putBoolean("gpsPosition", true);	        	
     	}
     	else
     	{
@@ -275,7 +279,7 @@ public class securityTab extends Activity{
     	{
         	editor.putBoolean("wifi", false);
         	
-        	chkWifiBSSID.setEnabled(true);
+        	chkWifiBSSID.setEnabled(false);
         	
         	editor.putBoolean("wifiBSSID", true);
     	}

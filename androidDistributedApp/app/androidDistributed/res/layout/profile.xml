@@ -12,17 +12,6 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="20dp"
-                android:layout_weight="0.38"
-                android:text="PhoneId: "
-                android:textColor="#36ACF5"
-                android:textSize="15dp" />
             
         </LinearLayout>
         
@@ -32,40 +21,18 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/TextView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_weight="0.38"
-            android:text="Phone statistics: "
-            android:textColor="#36ACF5"
-            android:textSize="15dp" />
         
-        
-        
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="1dp"
-            android:background="#7F7E85" />
-
        <TextView
            android:id="@+id/textView3"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:layout_gravity="center"
            android:layout_weight="0.15"
-           android:text="Available Sensors"
+           android:text="phone status"
            android:textColor="#36ACF5"
            android:textSize="15dp" />
         
     </LinearLayout> 
-
-     <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#7F7E85" />
     
     <ListView
         android:id="@+id/sensorsLV"
@@ -73,35 +40,45 @@
         android:layout_height="299dp"
         android:layout_weight="0.77" >
     </ListView> 
-     
+   
+    
+         <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:background="#7F7E85" />
+    
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <ImageView
             android:id="@+id/imageView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
             android:layout_margin="5dp"
             android:src="@drawable/database_disconnected" />
 
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="20dp"
-                android:layout_weight="0.15"
-                android:text="Connection status: "
-                android:textColor="#36ACF5"
-                android:textSize="15dp" />
+        <View
+            android:layout_height="fill_parent"
+  			android:layout_width="150dp">
+		</View>
+        
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="20dp"
+            android:text="PhoneId:"
+            android:textColor="#36ACF5"
+            android:textSize="15dp" />
 
             <ImageView
                 android:id="@+id/imageView3"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_gravity="center"
-                android:layout_margin="5dp"
                 android:src="@drawable/register" />
 
     </LinearLayout>

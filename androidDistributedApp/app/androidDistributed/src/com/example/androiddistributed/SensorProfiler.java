@@ -66,8 +66,8 @@ public class SensorProfiler extends Thread implements Runnable {
 		// map sensors to contextTypes
 		sensorsContextTypes.put("batteryLevel", "org.ambientdynamix.contextplugins.batteryLevelPlugin");
 		sensorsContextTypes.put("batteryTemperature", "org.ambientdynamix.contextplugins.batteryTemperaturePlugin");		
-		sensorsContextTypes.put("gpsPosition", "org.ambientdynamix.contextplugins.gpsplugin");		
-		sensorsContextTypes.put("wifiBSSID", "org.ambientdynamix.contextplugins.Wifiplugin");
+		sensorsContextTypes.put("gpsPosition", "org.ambientdynamix.contextplugins.GpsPlugin");		
+		sensorsContextTypes.put("wifiBSSID", "org.ambientdynamix.contextplugins.WifiScanPlugin");
 		
 		// get sensor permissions
 		permissions = new ArrayList<String>();
@@ -125,7 +125,10 @@ public class SensorProfiler extends Thread implements Runnable {
 	
 	// set the user permissions about the sensors
 	private void setPermissions()
-	{		
+	{	
+		sensorRules = "|";
+		sensorsPermissions.clear();
+		
 		for(String sensor : sensors)
 		{
 			if(permissions.contains(sensor))
@@ -143,6 +146,8 @@ public class SensorProfiler extends Thread implements Runnable {
 	// get user permissions about the sensors
 	private void getPermissions()
 	{		
+		permissions.clear();
+		
 		editor.commit();
     	
 	    // run first time after installation - or data clean
@@ -219,7 +224,7 @@ public class SensorProfiler extends Thread implements Runnable {
 	    	switch(type)
 	    	{
 	    		case Sensor.TYPE_ACCELEROMETER : { type_s = "accelerometer"; break; }
-	    		case Sensor.TYPE_TEMPERATURE : { type_s = "batteryTemperature"; break; }
+	 //   		case Sensor.TYPE_TEMPERATURE : { type_s = "batteryTemperature"; break; }
 	    		case Sensor.TYPE_MAGNETIC_FIELD : { type_s = "magnetic field"; break; }
 	    		case Sensor.TYPE_ORIENTATION : { type_s = "orientation"; break;  }
 	    		default : { type_s = "uknown" ; break; }

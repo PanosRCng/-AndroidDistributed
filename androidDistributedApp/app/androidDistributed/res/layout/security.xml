@@ -15,7 +15,7 @@
            android:layout_height="wrap_content"
            android:layout_gravity="center"
            android:layout_weight="0.15"
-           android:text="Available Sensors"
+           android:text="Sensors Rules"
            android:textColor="#36ACF5"
            android:textSize="15dp" />
         
@@ -89,15 +89,14 @@
                      android:id="@+id/checkBox3"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:text="position" 
+                     android:text="gps position" 
                      android:textColor="#36ACF5"/>
 
                  <CheckBox
                      android:id="@+id/checkBox4"
                      android:layout_width="wrap_content"
                      android:layout_height="wrap_content"
-                     android:text="CheckBox"
-                     android:textColor="#36ACF5" />
+                     android:text="CheckBox" />
 
              </LinearLayout>
 
@@ -126,14 +125,14 @@
                  android:id="@+id/checkBox5"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="CheckBox"
+                 android:text="Wifi BSSID"
                  android:textColor="#36ACF5" />
 
              <CheckBox
                  android:id="@+id/checkBox6"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:text="CheckBox"
+                 android:text="wifi scan"
                  android:textColor="#36ACF5" />
 
          </LinearLayout>
@@ -149,26 +148,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" >
-       
-        <TextView
-           android:id="@+id/textView4"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_gravity="center"
-           android:layout_weight="0.15"
-           android:text="Time Rules"
-           android:textColor="#36ACF5"
-           android:textSize="15dp" />
-        
-        <TextView
-           android:id="@+id/textView5"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_gravity="center"
-           android:layout_weight="0.15"
-           android:text="Position Rules"
-           android:textColor="#36ACF5"
-           android:textSize="15dp" />
         
     </LinearLayout>
     	

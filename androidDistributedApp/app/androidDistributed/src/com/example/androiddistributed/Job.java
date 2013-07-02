@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.ambientdynamix.api.application.IContextInfo;
+import org.ambientdynamix.contextplugins.GpsPlugin.IGpsPluginInfo;
 import org.ambientdynamix.contextplugins.WifiPlugin.IWifiPluginInfo;
+import org.ambientdynamix.contextplugins.WifiScanPlugin.IWifiScanPluginInfo;
 import org.ambientdynamix.contextplugins.batteryLevelPlugin.IBatteryLevelPluginInfo;
 import org.ambientdynamix.contextplugins.batteryTemperaturePlugin.IBatteryTemperaturePluginInfo;
-import org.ambientdynamix.contextplugins.gpsplugin.IGpsPluginInfo;
 import org.ambientdynamix.contextplugins.myExperimentPlugin.IExperimentPluginInfo;
 import org.ambientdynamix.contextplugins.oneplugin.IOnePluginInfo;
 
@@ -20,7 +21,7 @@ public class Job {
 	
 	private String contextType;
 	private Scheduler scheduler;
-	private String jobState;
+	public String jobState;
 	
 	private List<String> dependencies;
 	private Map<String, Boolean> allowedDependencies;
@@ -29,7 +30,7 @@ public class Job {
 	// null constructor
 	public Job()
 	{
-		//
+		this.jobState = null;
 	}
 	
 	// constructor
@@ -37,7 +38,7 @@ public class Job {
 	{
 		this.contextType = contextType;
 		this.scheduler = scheduler;
-		setState("not_ready");		
+		setState("not_ready");				
 		dependencies = new ArrayList<String>();
 		allowedDependencies = new HashMap<String, Boolean>();
 		wakedDependencies = new HashMap<String, Boolean>();
@@ -51,7 +52,7 @@ public class Job {
 	
 
 	public void getMsg(IContextInfo nativeInfo)
-	{			
+	{					
 		if(nativeInfo instanceof IExperimentPluginInfo)
 		{			
 			IExperimentPluginInfo info = (IExperimentPluginInfo) nativeInfo;
@@ -62,27 +63,36 @@ public class Job {
 				if(pluginState.equals("ready"))
 				{
 					// get job dependencies
-					setDependencies(info.getDependencies());
-
-					for(String dependency : dependencies)
-					{							
-						if( scheduler.sensorsPermissions.get(dependency) )
-						{							
-							setAllowedDependency(dependency, true);
-						}
-						else
-						{
-							setAllowedDependency(dependency, false);
-						}
-					}
-
-					// call dependencies plugins
-					for( String dependency : dependencies )
+					if( setDependencies(info.getDependencies()) )
 					{
-						scheduler.commitDependency(dependency);	
+						for(String dependency : dependencies)
+						{	
+							if( scheduler.sensorsPermissions.get(dependency) )
+							{										
+								setAllowedDependency(dependency, true);
+							}
+							else
+							{								
+								setAllowedDependency(dependency, false);
+							}
+						}
 					}
+					
+					if( isDependenciesAllowed() )
+					{
+						// call dependencies plugins
+						for( String dependency : dependencies )
+						{						
+							scheduler.commitDependency(dependency);	
+						}
 
-					setState("pending_initialization");
+						setState("pending_initialization");
+					}
+					else
+					{
+						scheduler.calcelCurrentJob();
+					}
+					
 				}
 				else if( pluginState.equals("stopped") )
 				{	
@@ -117,7 +127,7 @@ public class Job {
 			{	
 				setWakedDependency(nativeInfo.getContextType(), true);
 
-				if( isDependenciesWaked() && isDependenciesAllowed() )
+				if( isDependenciesWaked() )
 				{
 					setState("initialized");
 
@@ -147,7 +157,7 @@ public class Job {
 			{	
 				setWakedDependency(nativeInfo.getContextType(), true);
 
-				if( isDependenciesWaked() && isDependenciesAllowed() )
+				if( isDependenciesWaked() )
 				{
 					setState("initialized");
 
@@ -179,7 +189,7 @@ public class Job {
 			{	
 				setWakedDependency(nativeInfo.getContextType(), true);
 
-				if( isDependenciesWaked() && isDependenciesAllowed() )
+				if( isDependenciesWaked() )
 				{
 					setState("initialized");
 
@@ -211,7 +221,7 @@ public class Job {
 			{	
 				setWakedDependency(nativeInfo.getContextType(), true);
 
-				if( isDependenciesWaked() && isDependenciesAllowed() )
+				if( isDependenciesWaked() )
 				{
 					setState("initialized");
 
@@ -236,15 +246,15 @@ public class Job {
 			}	
 		}
 		else if(nativeInfo instanceof IWifiPluginInfo)
-		{
+		{			
 			IWifiPluginInfo info = (IWifiPluginInfo) nativeInfo;
-
+			
 			if( jobState.equals("pending_initialization") )
 			{	
 				setWakedDependency(nativeInfo.getContextType(), true);
-
-				if( isDependenciesWaked() && isDependenciesAllowed() )
-				{
+				
+				if( isDependenciesWaked() )
+				{					
 					setState("initialized");
 
 					scheduler.doJobPlugin(this.getContextType());
@@ -267,6 +277,38 @@ public class Job {
 				scheduler.sendData(this.getContextType(), data);
 			}	
 		}
+		else if(nativeInfo instanceof IWifiScanPluginInfo)
+		{			
+			IWifiScanPluginInfo info = (IWifiScanPluginInfo) nativeInfo;
+			
+			if( jobState.equals("pending_initialization") )
+			{	
+				setWakedDependency(nativeInfo.getContextType(), true);
+				
+				if( isDependenciesWaked() )
+				{					
+					setState("initialized");
+
+					scheduler.doJobPlugin(this.getContextType());
+					for(String dependency : dependencies)
+					{
+						scheduler.doJobPlugin(dependency);
+					}
+
+					setState("running");
+				}
+			}
+			else if( jobState.equals("running") )
+			{				
+				String scanJson = info.getScan();
+				
+				Bundle data = new Bundle();
+				data.putString("command", info.getContextType());
+				data.putString("data", scanJson);
+				
+				scheduler.sendData(this.getContextType(), data);
+			}	
+		}
 	}
 
 	
@@ -280,17 +322,22 @@ public class Job {
 		return contextType;
 	}
 		
-	private void setDependencies(List<String> contextTypes)
+	private boolean setDependencies(List<String> contextTypes)
 	{		
-		String message = "!";
-		
-		for(String dependency : contextTypes)
+		if(dependencies.size() == 0)
 		{
-			dependencies.add(dependency);
-			message = message + dependency + "!";
+			String message = "!";
+		
+			for(String dependency : contextTypes)
+			{				
+				dependencies.add(dependency);
+				message = message + dependency + "!";
+			}
+		
+			scheduler.sendThreadMessage("jobDependencies:"+message);
 		}
 		
-		scheduler.sendThreadMessage("jobDependencies:"+message);
+		return true;
 	}
 	
 	public void setWakedDependency(String contextType, boolean waked)
@@ -299,7 +346,7 @@ public class Job {
 	}
 	
 	private void setAllowedDependency(String contextType, boolean allowed)
-	{
+	{		
 		allowedDependencies.put(contextType, allowed);
 	}
 	
@@ -308,9 +355,9 @@ public class Job {
 		boolean allowed = true;
 		
 		for(String dependency : dependencies)
-		{
+		{			
 			if( !allowedDependencies.get(dependency) )
-			{
+			{				
 				allowed = false;
 			}
 		}
@@ -329,7 +376,7 @@ public class Job {
 				waked = false;
 			}
 		}
-		
+				
 		return waked;
 	}
 	

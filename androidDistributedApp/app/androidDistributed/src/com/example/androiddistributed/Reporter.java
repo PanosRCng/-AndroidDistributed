@@ -18,6 +18,8 @@ import org.ksoap2.transport.HttpTransportSE;
 import com.google.gson.Gson;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -30,11 +32,17 @@ public class Reporter extends Thread implements Runnable {
 	private Context context;
 	private Communication communication;
 	
+	private SharedPreferences pref;
+	private Editor editor;
+	
 	public Reporter(Handler handler, Context context, Communication communication)
 	{
 		this.handler = handler;
 		this.context = context;
 		this.communication = communication;
+		
+        pref = context.getApplicationContext().getSharedPreferences("runningJob", 0); // 0 - for private mode
+        editor = pref.edit();
 	}
 	
 	public void run()
@@ -61,10 +69,20 @@ public class Reporter extends Thread implements Runnable {
 	{
 		Log.i(TAG, "reporter report job with job_id: " + jobId);
 		
+		editor.putString("runningJob", "-1");
+		editor.putString("runningExperimentUrl", "-1");
+		editor.putString("lastExperiment", jobId);
+		editor.commit();
+		
+		sendThreadMessage("job_name:" + "no job running");
+		
+   // 	File root = android.os.Environment.getExternalStorageDirectory(); 
+    //    context.deleteFile(root.getAbsolutePath() + "/dynamix/" + jobId + "_9.47.1.jar");
+        	
+        Log.i("delete exp", "ok experiment must be deleted now");
+				
 		if( communication.ping() )
-		{		
-			Log.i("WTF", "we got a ping");
-			
+		{					
 			String jobReportPath = null;
 			ArrayList<String> jobResults = new ArrayList<String>();
 			
@@ -92,11 +110,11 @@ public class Reporter extends Thread implements Runnable {
 						
 						if(ack == 1)
 						{
-		                    if( file.delete() )
+							File d_file = new File(dir, file.getName());
+							
+		                    if( d_file.delete() )
 		                    {
-		                    	Log.i(TAG, "ok we finish here");
-		                    	
-		                    	// refresh report tab
+		                		sendThreadMessage("report_job:" + jobId);
 		                    }
 						}
 					}

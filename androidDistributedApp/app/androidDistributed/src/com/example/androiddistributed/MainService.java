@@ -1,8 +1,10 @@
 package com.example.androiddistributed;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -14,6 +16,8 @@ public class MainService extends Service
 	private final String TAG = this.getClass().getSimpleName();
 		
 	private Context context;
+	
+//	private DynamixReceiver dynamixReceiver;
 	
 	private Demon demon;
     private Scheduler scheduler;
@@ -110,7 +114,14 @@ public class MainService extends Service
 					String[] parts = message.split(":");
 					String jobName = parts[1];
 					
-					sendMessageIntent("report_job", jobName);
+					sendMessageIntent("job_report", jobName);
+				}
+				else if( message.contains("job_name:") )
+				{
+					String[] parts = message.split(":");
+					String jobName = parts[1];
+
+					sendMessageIntent("job_name", jobName);
 				}
 				else
 				{
@@ -166,16 +177,30 @@ public class MainService extends Service
 	    reporter.start();
 		scheduler.start();
 		demon.start();
-	    
+	
+//		dynamixReceiver = new DynamixReceiver();
+		
+	    IntentFilter filter = new IntentFilter();
+		filter.addAction("com.example.androiddistributed.MainService");
+		
+//		registerReceiver(dynamixReceiver, filter);
+		
 		// connect to dynamix framework
 		scheduler.connect_to_dynamix();
-	
-		// commit job/plugin test to dynamix framework
-//		scheduler.commitJob("org.ambientdynamix.contextplugins.addplugin");
 		
         return mMessenger.getBinder();
     }
        
+    public class DynamixReceiver extends BroadcastReceiver
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {      
+            Log.i("WTF", " ok dynamix, you start, i fucking get it");
+        }
+        
+    }
+    
 	// send intent to MainActivity
 	private void sendMessageIntent(String message, String value)
 	{		
