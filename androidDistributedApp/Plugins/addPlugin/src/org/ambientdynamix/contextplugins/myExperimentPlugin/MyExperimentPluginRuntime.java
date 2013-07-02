@@ -61,7 +61,7 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 			if(running)
 			{	
 				doJob();
-				handler.postDelayed(this, 200000);
+				handler.postDelayed(this, 20000);
 			}
 		}
 	};
@@ -137,7 +137,7 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 		{
 			position = config.getString("data");	
 		}
-		else if( command.equals("start") )
+*/		else if( command.equals("start") )
 		{
 			start();
 		}
@@ -149,7 +149,7 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 		{
 			Log.i(TAG, "command not supported");
 		}
-*/
+
 	}	
 	
 	@Override
@@ -199,7 +199,7 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 	{
 		running = true;
 		setState("running");
-		handler.postDelayed(runnable, 200000);
+		handler.postDelayed(runnable, 20000);
 	}
 	
 	private void doJob()
