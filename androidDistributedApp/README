@@ -5,7 +5,6 @@ This is an android project build for the Android.2.3.3 (API level 10) using dyna
 
 public
 
-http://83.212.115.57
-
-
+website: http://83.212.115.57/androidDistributed
+web service: http://83.212.115.57:8080/ADService/services/HelloWorld?wsdl
 
