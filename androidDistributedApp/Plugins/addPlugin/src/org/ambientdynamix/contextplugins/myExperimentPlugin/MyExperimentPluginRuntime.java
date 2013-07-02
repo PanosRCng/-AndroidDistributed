@@ -33,21 +33,21 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 	{
 		{
 			add("org.ambientdynamix.contextplugins.WifiScanPlugin");
-			add("org.ambientdynamix.contextplugins.GpsPlugin");
+//			add("org.ambientdynamix.contextplugins.GpsPlugin");
 		}
 	};	
 	
 	public static String CONTEXT_TYPE = "org.ambientdynamix.contextplugins.myExperimentPlugin";
 	
 	private String dependency1 = "org.ambientdynamix.contextplugins.WifiScanPlugin";
-	private String dependency2 = "org.ambientdynamix.contextplugins.GpsPlugin";
+//	private String dependency2 = "org.ambientdynamix.contextplugins.GpsPlugin";
 	
 	private int samples = 2;
 	private int sample_counter = 0;
 	
 	private Map<String, String> wifiMap;
 	private String scanJson = "-1";
-	private String position = "-1";
+//	private String position = "-1";
 	private Bundle results;
 	
 	private String state;
@@ -77,7 +77,7 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 		
 		wifiMap = new HashMap<String, String>();
 		scanJson = "-1";
-		position = "-1";
+//		position = "-1";
 		
 		state = "not_ready";
 		handler = new Handler();
@@ -128,12 +128,12 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 				int frequency = wifiList.get(i).frequency;
 				int level = wifiList.get(i).level;
 
-				String line = BSSID + "\t" + position +  "\t" + capabilities + "\t" + SSID + "\t" + frequency + "\t" + level;
+				String line = BSSID + "\t" + capabilities + "\t" + SSID + "\t" + frequency + "\t" + level;
 				wifiMap.put(BSSID, line);
 			}		
 
 		}
-		else if( command.equals(dependency2) )
+/*		else if( command.equals(dependency2) )
 		{
 			position = config.getString("data");	
 		}
@@ -149,6 +149,7 @@ public class MyExperimentPluginRuntime extends AutoReactiveContextPluginRuntime 
 		{
 			Log.i(TAG, "command not supported");
 		}
+*/
 	}	
 	
 	@Override

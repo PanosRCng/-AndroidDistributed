@@ -81,6 +81,7 @@ public class WifiPluginRuntime extends AutoReactiveContextPluginRuntime {
 			  Log.i("WTF", "SPEED: " + Speed);
 			  Log.i("WTF", "RSSID: " + RSSID);
 			  
+			  this.bssid = BSSID;
 		  }
 		  else
 		  {
