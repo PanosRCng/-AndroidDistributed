@@ -1,9 +1,13 @@
-The kickass android application
+The AndroidDistributed project
 
-This is an android project build for the Android.2.3.3 (API level 10) using dynamix framework version 0.9.47
+This is an android project about internet of things
 
+distributes code on the android devices network and gets back results
 
-public
+there is a central system that distributes the codes and collect the results
+
+uses dynamix framework for OSGI
+
 
 website: http://83.212.115.57/androidDistributed
 web service: http://83.212.115.57:8080/ADService/services/HelloWorld?wsdl
