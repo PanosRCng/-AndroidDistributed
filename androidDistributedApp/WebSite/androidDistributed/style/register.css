@@ -1,0 +1,56 @@
+
+body {
+	margin:0;
+	padding:40px;
+	background:#fff;
+	font:80% Arial, Helvetica, sans-serif;
+	color:#555;
+	line-height:180%;
+}
+
+h1{
+	font-size:180%;
+	font-weight:normal;
+	color:#555;
+}
+
+
+.error{
+	font-weight:bold;
+	color: #C00
+}
+
+#register_form{
+   position: relative;
+   float: left;
+   left: 100px;
+}
+
+#image{
+   position: relative;
+   float: right;
+   width: 600px;
+   left: 0px;
+}
+
+#wrapper{
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 100%;
+   background-color: #fff
+}
+
+#header{
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 100%;
+}
+
+#footer{
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 100%;
+}

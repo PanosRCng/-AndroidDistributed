@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contextPlugins version="1.0.0" xmlns:android="http://schemas.android.com/apk/res/android">
+ 
+   <contextPlugin 
+        metadataVersion="1.0.0" 
+
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.batteryTemperaturePlugin"
+
+        pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.batteryTemperaturePlugin.PluginFactory">
+		<name>Battery Temperature Plugin</name>
+		<description>Battery Temperature Plugin</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides configurable sample data in bytes. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.batteryTemperaturePlugin</contextType>
+		</supportedContextTypes>
+		<permissions/>
+		<installUrl>/dynamix/org.ambientdynamix.contextplugins.batteryTemperaturePlugin_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+    </contextPlugin>
+
+   <contextPlugin 
+        metadataVersion="1.0.0" 
+
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.batteryLevelPlugin"
+
+        pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.batteryLevelPlugin.PluginFactory">
+		<name>Battery Level Plugin</name>
+		<description>Battery Level Plugin</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides configurable sample data in bytes. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.batteryLevelPlugin</contextType>
+		</supportedContextTypes>
+		<permissions/>
+		<installUrl>/dynamix/org.ambientdynamix.contextplugins.batteryLevelPlugin_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+    </contextPlugin>
+
+   <contextPlugin 
+        metadataVersion="1.0.0" 
+
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.oneplugin"
+
+        pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.oneplugin.PluginFactory">
+		<name>One Plugin</name>
+		<description>One Plugin</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides configurable sample data in bytes. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.oneplugin</contextType>
+		</supportedContextTypes>
+		<permissions/>
+		<installUrl>/dynamix/org.ambientdynamix.contextplugins.oneplugin_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+    </contextPlugin>	
+
+
+   <contextPlugin 
+        metadataVersion="1.0.0" 
+
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.twoplugin"
+
+        pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.twoplugin.PluginFactory">
+		<name>Two Plugin</name>
+		<description>Two Plugin</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides configurable sample data in bytes. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.twoplugin</contextType>
+		</supportedContextTypes>
+		<permissions/>
+		<installUrl>/dynamix/org.ambientdynamix.contextplugins.twoplugin_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+    </contextPlugin>	
+
+   <contextPlugin 
+        metadataVersion="1.0.0" 
+
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.addplugin"
+
+        pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.addplugin.PluginFactory">
+		<name>Add Plugin</name>
+		<description>Add Plugin</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides configurable sample data in bytes. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.addplugin</contextType>
+		</supportedContextTypes>
+		<permissions/>
+		<installUrl>/dynamix/org.ambientdynamix.contextplugins.addplugin_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+    </contextPlugin>	
+
+   <contextPlugin 
+        metadataVersion="1.0.0" 
+
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.gpsplugin"
+
+        pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.gpsplugin.PluginFactory">
+		<name>GPS Plugin</name>
+		<description>GPS Plugin</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides configurable sample data in bytes. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.gpsplugin</contextType>
+		</supportedContextTypes>
+		<permissions/>
+		<installUrl>/dynamix/org.ambientdynamix.contextplugins.gpsplugin_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+    </contextPlugin>
+
+</contextPlugins>

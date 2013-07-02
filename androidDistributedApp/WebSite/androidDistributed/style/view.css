@@ -1,0 +1,150 @@
+
+body {
+	margin:0;
+	padding:40px;
+	background:#fff;
+	font:80% Arial, Helvetica, sans-serif;
+	color:#555;
+	line-height:180%;
+}
+
+h1{
+	font-size:180%;
+	font-weight:normal;
+	color:#555;
+}
+
+
+.error{
+	font-weight:bold;
+	color: #C00
+}
+
+#wrapper_options{
+   position: relative;
+   float: right;
+   left: 0%;
+   width: 100%;
+   background-color: #fff
+}
+
+#options{
+   font:100% Arial, Helvetica, sans-serif;
+   position: relative;
+   float: right;
+   left: 0%;
+   background-color: #fff
+}
+
+#rank_button_place{
+  width: 100%;  
+  float: right; 
+  background: white;
+}
+
+#rank_text{
+  position: relative;
+  width: 100%;  
+  float: left; 
+  background: white;
+}
+
+#rank_container{
+  border: 1px solid #ccc; 
+  width: 100%; 
+  margin: 2px 5px 2px 0; 
+  padding: 1px; 
+  float: left; 
+  background: white;
+}
+
+#likes{
+  height: 5px;
+  float: left; 
+  background-color: #ACE97C; 
+}
+
+#dislikes{ 
+  height: 5px;
+  float: right; 
+  background-color: #DF1B16; 
+}
+
+#wrapper_up{
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 100%;
+   background-color: #fff
+}
+
+#wrapper_down{
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 100%;
+   background-color: #fff
+}
+
+#comments_view{
+   margin:30px;
+   padding:0px;
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 30%;
+   background-color: #fff
+}
+
+#map{
+   margin:30px;
+   padding:0px;
+   position: relative;
+   float: right;
+   left: 0px;
+   width: 50%;
+   background-color: #fff
+}
+
+#image_view{
+   margin:30px;
+   padding:0px;
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 50%;
+   background-color: #fff
+}
+
+#image_infos{
+   margin:5%;
+   padding:0px;
+   position: relative;
+   float: left;
+   width: 30%;
+   background-color: #fff
+}
+
+#rank_place{
+   margin:30px;
+   padding:0px;
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 100%;
+   background-color: #fff
+}
+
+#header{
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 100%;
+}
+
+#footer{
+   position: relative;
+   float: left;
+   left: 0px;
+   width: 100%;
+}
