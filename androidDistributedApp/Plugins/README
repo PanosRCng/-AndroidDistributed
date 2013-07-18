@@ -1,0 +1,3 @@
+Dynamix Open Plug-in SDK Release Notes
+
+Simply integrate this project into your Eclipse workspace before importing or writing Dynamix plug-in projects. The XML files provide plug-in repository examples for both network and file-system scenarios. Importantly, you MUST NOT include the 'org.ambientdynamix.contextplugin.api_v0.9.54.jar' on your plug-in's build path, and it MUST NOT be exported with your plug-in. The context plug-in API files are provided to your plug-in at runtime by the Dynamix framrwork using OSGi.
