@@ -48,6 +48,8 @@ public class jobsTab extends Activity {
     
     public void loaJobdDependencies(String dependenciesMsg)
     {
+    	dependencies.clear();
+    	
     	String[] parts = dependenciesMsg.split("!");
     	    	
     	for(String part : parts)

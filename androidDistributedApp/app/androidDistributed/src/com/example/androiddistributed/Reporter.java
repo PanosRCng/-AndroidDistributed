@@ -76,8 +76,8 @@ public class Reporter extends Thread implements Runnable {
 		
 		sendThreadMessage("job_name:" + "no job running");
 		
-   // 	File root = android.os.Environment.getExternalStorageDirectory(); 
-    //    context.deleteFile(root.getAbsolutePath() + "/dynamix/" + jobId + "_9.47.1.jar");
+//		File root = android.os.Environment.getExternalStorageDirectory(); 
+//		context.deleteFile(root.getAbsolutePath() + "/dynamix/" + jobId + "_9.47.1.jar");
         	
         Log.i("delete exp", "ok experiment must be deleted now");
 				

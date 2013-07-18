@@ -322,6 +322,8 @@ public class Scheduler extends Thread implements Runnable {
 		public void onContextPluginDiscoveryFinished(List<ContextPluginInformation> discoveredPlugins)
 				throws RemoteException {
 			Log.i(TAG, "A1 - onContextPluginDiscoveryFinished");
+			
+			commitJob("org.ambientdynamix.contextplugins.myExperimentPlugin");
 		}
 
 		@Override
@@ -618,7 +620,9 @@ public class Scheduler extends Thread implements Runnable {
 		reporter.report(jobId);
 		
 		stopCurrentPlugin();
-		currentJob = new Job();
+	//	currentJob = new Job();
+		
+		calcelCurrentJob();
 	}
 	
 	public void sendThreadMessage(String message)

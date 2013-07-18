@@ -9,6 +9,7 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import com.google.gson.Gson;
 
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -50,7 +51,7 @@ public class Communication extends Thread implements Runnable {
 		return false;
 	}
 	
-	private int sendPing(String jsonPing)
+	public int sendPing(String jsonPing)
 	{
 		final String METHOD_NAME = "Ping";
 		final String SOAP_ACTION = "\""+"http://helloworld/Ping"+"\"";
@@ -77,10 +78,12 @@ public class Communication extends Thread implements Runnable {
 			SoapPrimitive  resultsRequestSOAP = (SoapPrimitive) envelope.getResponse();
 			
 			pong = Integer.parseInt(resultsRequestSOAP.toString()); 
+			
+			Log.i("WTF ping", resultsRequestSOAP.toString());
 		}
 		catch (Exception e)
 		{
-			//
+			Log.i("WTF catch", e.toString());
 		}
 		
 		// ksoap2 HttpTransportSE issue -- connection never timeout or close
@@ -328,4 +331,5 @@ public class Communication extends Thread implements Runnable {
 		
 		return ack;
 	}
+	  
 }

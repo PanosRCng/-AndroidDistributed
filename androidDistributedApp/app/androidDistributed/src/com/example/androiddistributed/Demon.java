@@ -5,12 +5,20 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
 import com.google.gson.Gson;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -71,10 +79,7 @@ public class Demon extends Thread implements Runnable {
 			checkFile("org.ambientdynamix.contextplugins.WifiScanPlugin_9.47.1.jar");
 			
 			handler.postDelayed(runnable, 10000);
-			
-			// tell to dynamix Framework to update its repository
-	//		updateDynamixRepository();
-								
+											
 		}
 		catch (InterruptedException e)
 		{
@@ -87,12 +92,16 @@ public class Demon extends Thread implements Runnable {
 		@Override
 		public void run()
 		{
-			pingExperiment();
-			handler.postDelayed(this, 20000);
+//			pingExperiment();
+			
+	    	AsyncPingExp pingExp = new AsyncPingExp();
+	    	pingExp.execute();
+			
+			handler.postDelayed(this, 60000);
 		}
 	};
 	
-	private void pingExperiment()
+/*	private void pingExperiment()
 	{		
         runningJob = pref.getString("runningJob", "-1");
         lastRunned = pref.getString("lastExperiment", "-1");
@@ -100,7 +109,7 @@ public class Demon extends Thread implements Runnable {
 		Log.i("running job", runningJob);
 		
 		if( runningJob.equals("-1") )
-		{		
+		{					
 			if( communication.ping() )
 			{
 				String jsonExperiment = communication.getExperiment( phoneProfiler.getPhoneId(), sensorProfiler.getSensorRules() );
@@ -127,10 +136,10 @@ public class Demon extends Thread implements Runnable {
 						String contextType = experiment.getContextType();
 						String url = experiment.getUrl();
 
-				//		if( lastRunned.equals(contextType) )
-				//		{
-				//			return;
-				//		}
+					//	if( lastRunned.equals(contextType) )
+					//	{
+					//		return;
+					//	}
 						
 						Downloader downloader = new Downloader();
 	       	 			downloader.DownloadFromUrl(url, contextType+"_9.47.1.jar");
@@ -141,7 +150,10 @@ public class Demon extends Thread implements Runnable {
 	       	 			
 	       	 			sendThreadMessage("job_name:"+experiment.getName());
 	       	 			
-	       	 			scheduler.commitJob(contextType);	
+	       				// tell to dynamix Framework to update its repository
+	       	 			updateDynamixRepository();
+	       	 			
+	       	 		//	scheduler.commitJob(contextType);	
 					}
 					else
 					{
@@ -168,6 +180,7 @@ public class Demon extends Thread implements Runnable {
 
 		}
 	}
+*/
 	
 	private void checkFile(String myFile)
 	{	
@@ -208,4 +221,109 @@ public class Demon extends Thread implements Runnable {
 		msg.obj = message;
 		handler.sendMessage(msg);
 	}
+	
+	public class AsyncPingExp extends AsyncTask<String, Void, String>
+	{				
+	    @Override
+	    protected String doInBackground(String... params)
+	    {
+	        runningJob = pref.getString("runningJob", "-1");
+	        lastRunned = pref.getString("lastExperiment", "-1");
+	        
+			Log.i("running job", runningJob);
+			
+			if( runningJob.equals("-1") )
+			{					
+				if( communication.ping() )
+				{
+					String jsonExperiment = communication.getExperiment( phoneProfiler.getPhoneId(), sensorProfiler.getSensorRules() );
+				
+					Log.i(TAG, jsonExperiment);
+				
+					if(jsonExperiment.equals("0"))
+					{
+						Log.i(TAG, "no experiment for us");
+					}
+					else
+					{						
+						Gson gson = new Gson();
+						Experiment experiment = gson.fromJson(jsonExperiment, Experiment.class);				
+
+						String[] smarDeps = sensorProfiler.getSensorRules().split("|");
+						String[] expDeps = experiment.getSensorDependencies().split("|");
+		       		
+						Set<String> smarSet = new HashSet<String>(Arrays.asList(smarDeps));
+						Set<String> expSet = new HashSet<String>(Arrays.asList(expDeps));
+						
+						if( smarSet.equals(expSet) )
+						{							
+							String contextType = experiment.getContextType();
+							String url = experiment.getUrl();
+							
+					//		if( lastRunned.equals(contextType) )
+					//		{
+					//			return "";
+					//		}
+							
+							Downloader downloader = new Downloader();
+		       	 			downloader.DownloadFromUrl(url, contextType+"_9.47.1.jar");
+		       	 			
+		       	 			editor.putString("runningJob", contextType);
+		       	 			editor.putString("runningExperimentUrl", experiment.getUrl());
+		       	 			editor.commit();
+		       	 			
+		       	 			sendThreadMessage("job_name:"+experiment.getName());
+		       	 			
+		       				// tell to dynamix Framework to update its repository
+		       	 			updateDynamixRepository();
+		       	 			
+		       	 			scheduler.commitJob(contextType);	
+						}
+						else
+						{
+							Log.i(TAG, "this experiment violates my sensor rules");
+						}
+					}
+				}
+				else
+				{
+					Log.i("WTF", "no ping for us");
+				}
+			}
+			else
+			{	
+				if(scheduler.currentJob.jobState == null)
+				{
+					String runningExperimentUrl = pref.getString("runningExperimentUrl", "-1");
+					checkExperiment(runningJob, runningExperimentUrl);
+				
+	   	 			sendThreadMessage("job_name:"+runningJob);
+					
+					scheduler.commitJob(runningJob);
+				}
+
+			}
+
+	    	return "Executed";
+	    }      
+
+	    @Override
+	    protected void onPostExecute(String result)
+	    {
+	    	Log.i("WTF", "post execute");
+	    }
+
+	    @Override
+	    protected void onPreExecute()
+	    {
+	    	Log.i("WTF", "pre execute");
+	    }
+
+	    @Override
+	    protected void onProgressUpdate(Void... values)
+	    {
+	    	Log.i("WTF", "update progress");
+	    }
+	}  
+	
 }
