@@ -12,6 +12,7 @@ import android.content.Context;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -178,7 +179,14 @@ public class GpsPluginRuntime extends AutoReactiveContextPluginRuntime {
         locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
         locationListenerGps = new CurrentLocationGps();
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 1.0f, locationListenerGps);
+        try
+        {
+        	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 1.0f, locationListenerGps);
+        }
+        catch (Exception e)
+        {
+        	Log.i("WTF", e.toString());
+        }
         
 		setState("running");
 		running = true;
@@ -187,7 +195,16 @@ public class GpsPluginRuntime extends AutoReactiveContextPluginRuntime {
 	
 	private void doJob()
 	{
-		Log.i("bssid wifi plugin", this.location);
+        try
+        {
+        	locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000L, 1.0f, locationListenerGps);
+        }
+        catch (Exception e)
+        {
+        	Log.i("WTF", e.toString());
+        }
+        	
+		Log.i("gps plugin", this.location);
 		GpsPluginInfo info = new GpsPluginInfo(this.location);
 		this.sendBroadcastContextEvent(new SecuredContextInfo(info, PrivacyRiskLevel.LOW), 60000);
 	}
