@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contextPlugins version="9.47.1" xmlns:android="http://schemas.android.com/apk/res/android">
+	<contextPlugin
+		metadataVersion="9.47.1" 
+		repoType="simple-file"
+		id="org.ambientdynamix.contextplugins.GpsPlugin"
+		pluginVersion="9.47.1" 
+		pluginType="AUTO_REACTIVE"
+		provider="Ambient Dynamix"       
+		platform="android" 
+		minPlatformVersion="2.1" 
+		minFrameworkVersion="0.9.47" 
+		requiresConfiguration="false"
+		hasConfigurationView="true"
+		runtimeFactoryClass="org.ambientdynamix.contextplugins.GpsPlugin.PluginFactory">
+		<name>Gps Plugin</name>
+		<description>gives gps position</description>
+		<supportedPrivacyRiskLevels>			
+			<privacyRiskLevel name="LOW">gives gps position</privacyRiskLevel>			
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+			<contextType>org.ambientdynamix.contextplugins.GpsPlugin</contextType>
+		</supportedContextTypes>		
+		<featureDependencies/>			
+		<permissions/>				
+		<installUrl>dynamix/org.ambientdynamix.contextplugins.GpsPlugin_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+</contextPlugins>
