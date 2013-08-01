@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:gravity="center_vertical"
+    android:paddingRight="?android:attr/scrollbarSize">
+    
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="2dip"
+        android:layout_marginTop="6dip"
+        android:layout_marginBottom="6dip"
+        android:layout_weight="1">
+            
+        <TextView android:id="@+id/toptext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="false"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:ellipsize="marquee"
+            android:fadingEdge="horizontal" 
+            android:maxLines="2"
+            />
+            
+        <TextView android:id="@+id/summary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toptext"
+            android:layout_alignLeft="@+id/toptext"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:maxLines="3" 
+            android:fadingEdge="vertical"
+            /> 
+        
+        <ProgressBar android:id="@+id/progress"
+	        style="?android:attr/progressBarStyleHorizontal"
+	        android:layout_width="fill_parent"
+	        android:layout_height="5dip"
+	        android:max="100"
+	        android:progress="0"
+	        android:background="#00FF00"
+	        android:textColor="#00FF00"
+	        android:layout_below="@+id/summary"/>                     
+    </RelativeLayout>
+ 
+    
+    <!-- Preference should place its actual preference widget here. -->
+    <LinearLayout android:id="@+id/widget_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+        
+        <CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:id="@+id/checkedTextView"
+		    android:layout_width="fill_parent"
+		    android:layout_height="?android:attr/listPreferredItemHeight"
+		    android:textAppearance="?android:attr/textAppearanceLarge"
+		    android:gravity="center_vertical"
+		    android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+		    android:paddingLeft="5dip"
+		    android:paddingRight="5dip"/>
+  	</LinearLayout>  
+</LinearLayout>

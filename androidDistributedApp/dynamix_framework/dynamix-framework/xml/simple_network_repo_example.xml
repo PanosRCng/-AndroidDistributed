@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contextPlugins version="1.0.0" xmlns:android="http://schemas.android.com/apk/res/android">
+ 
+   <contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.zeo"
+				pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        		provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.zeo.PluginFactory">
+		<name>Zeo Sleep Plugin</name>
+		<description>Accesses sleep data from a Zeo sleep manager.</description>
+		<supportedPrivacyRiskLevels>			
+			<privacyRiskLevel name="MAX">Sleep Data</privacyRiskLevel>			
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.zeo.sleep.records</contextType>
+		  <contextType>org.ambientdynamix.contextplugins.zeo.headband.status</contextType>
+		</supportedContextTypes>		
+    <featureDependencies>
+	
+		</featureDependencies>			
+		<permissions/>	
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.zeo_9.47.1.jar</installUrl>
+		<updateUrl/>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+	
+  <contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.pedometer"
+				pluginVersion="9.47.1" 
+				pluginType="AUTO"
+        		provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.pedometer.PluginFactory">
+		<name>Pedometer Context Plugin</name>
+		<description>A push-based context plug-in that provides step and associated force information.</description>
+		<supportedPrivacyRiskLevels>			
+			<privacyRiskLevel name="LOW">Provides step events with associated force information.</privacyRiskLevel>			
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.pedometer</contextType>
+		</supportedContextTypes>		
+    <featureDependencies>
+		  <usesFeature android:name="android.hardware.sensor.accelerometer" android:required="true" />
+		</featureDependencies>			
+		<permissions>
+      <permission>Context.INPUT_METHOD_SERVICE</permission>
+      <permission>Context.WINDOW_SERVICE</permission>
+      <permission>Context.SENSOR_SERVICE</permission>   
+      <permission>Context.CLIPBOARD_SERVICE</permission>    
+    </permissions>	
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.pedometer_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+	
+  <contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.photodetector" 
+  			pluginVersion="9.47.1" 
+  			pluginType="AUTO_REACTIVE"
+        	provider="Dynamix Project"       
+  			platform="android" 
+  			minPlatformVersion="2.0" 
+  			minFrameworkVersion="0.9.47" 
+  			requiresConfiguration="false"
+  			hasConfigurationView="false"
+  			runtimeFactoryClass="org.ambientdynamix.contextplugins.photodetector.PluginFactory">
+  	<name>Photo Detector Plugin</name>
+  	<description>Detects light levels.</description>
+  	<supportedPrivacyRiskLevels>
+  		<privacyRiskLevel name="LOW">Provides the detected light level</privacyRiskLevel>
+  	</supportedPrivacyRiskLevels>
+    <supportedContextTypes>
+  	  <contextType>org.ambientdynamix.contextplugins.photodetector.luxvalue</contextType>
+  	</supportedContextTypes>
+    <featureDependencies>
+		  <usesFeature android:name="android.hardware.sensor.light" android:required="true" />
+		</featureDependencies>
+    <permissions>
+      <permission>Context.SENSOR_SERVICE</permission>    
+    </permissions>		
+  	<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.photodetector_9.47.1.jar</installUrl>
+  	<updateUrl></updateUrl>
+  	<updateMessage priority="OPTIONAL"></updateMessage>
+  </contextPlugin>
+
+  <contextPlugin 
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="de.smartassist.contextplugin"
+				pluginVersion="1.2.3" 
+				pluginType="REACTIVE"
+        		provider="The SmartAssist project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="true"
+				hasConfigurationView="true"
+				runtimeFactoryClass="de.smartassist.contextplugin.PluginFactory">
+		<name>SmartAssist Context Plugin</name>
+		<description>A pull-based context plug-in that provides profile and sensor updates from the SmartAssist portal. This plug-in must be configured with the user's SmartAssist security credentials.</description>
+		<supportedPrivacyRiskLevels>
+		  <privacyRiskLevel name="MEDIUM">Provides shared SmartAssist profile data.</privacyRiskLevel>
+			<privacyRiskLevel name="MAX">Provides shared SmartAssist profile data, plus all of the user's shared sensor data.</privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>de.smartassist.contextplugin.profileinfo</contextType>
+		  <contextType>de.smartassist.contextplugin.simplesensorvalues</contextType>		
+		</supportedContextTypes>	
+		<featureDependencies/>
+    <permissions>
+      <permission>Context.INPUT_METHOD_SERVICE</permission>
+      <permission>Context.WINDOW_SERVICE</permission>   
+      <permission>Context.LAYOUT_INFLATER_SERVICE</permission>
+      <permission>Context.CLIPBOARD_SERVICE</permission>   
+      <permission>Context.AUDIO_SERVICE</permission>  
+    </permissions>		
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/de.smartassist.contextplugin_1.2.3.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL">
+    <![CDATA[ 
+       <font color='white'>
+        <b>Version 1.2.1</b>
+        <p>Enhacements:</p>
+        <ul>
+            <li>Added build to body type element.</li>
+        </ul>
+        
+        <p>Notes:</p>
+        <ul>
+            <li>Apps should upgrade to de.smartassist.contextplugin_contextTypes-v1.2.1.jar</li>
+        </ul>
+        </font>
+        ]]>
+    
+      </updateMessage>
+	</contextPlugin>	
+
+  <contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.location" 
+  			pluginVersion="9.47.1" 
+  			pluginType="AUTO_REACTIVE"
+        	provider="Dynamix Project"       
+  			platform="android" 
+  			minPlatformVersion="2.0" 
+  			minFrameworkVersion="0.9.47" 
+  			requiresConfiguration="false"
+  			hasConfigurationView="false"
+  			runtimeFactoryClass="org.ambientdynamix.contextplugins.location.PluginFactory">
+  	<name>Location Context Plugin</name>
+  	<description>Provides Android location events using a power-aware version of the Android LocationManager. Supports all Dynamix Power profiles.</description>
+  	<supportedPrivacyRiskLevels>
+  		<privacyRiskLevel name="MAX">Location of the device based on the best available location provider (e.g. GPS or Network).</privacyRiskLevel>
+  	</supportedPrivacyRiskLevels>
+    <supportedContextTypes>
+  	  <contextType>org.ambientdynamix.contextplugins.location</contextType>
+  	</supportedContextTypes>
+    <featureDependencies>
+		  <usesFeature android:name="android.hardware.location" android:required="true" />
+		  <usesFeature android:name="android.hardware.location.network" android:required="false" />
+		  <usesFeature android:name="android.hardware.location.gps" android:required="true" />
+		</featureDependencies>
+    <permissions>
+      <permission>Manifest.permission.ACCESS_FINE_LOCATION</permission>
+      <permission>Context.LOCATION_SERVICE</permission>    
+    </permissions>		
+  	<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.location_9.47.1.jar</installUrl>
+  	<updateUrl></updateUrl>
+  	<updateMessage priority="OPTIONAL"></updateMessage>
+  </contextPlugin>
+	
+    <contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.wirelessbeacons"
+				pluginVersion="9.47.1" 
+				pluginType="AUTO_REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.wirelessbeacons.PluginFactory">
+		<name>Wireless Beacon Detector</name>
+		<description>Continually scans the environment for detectable wireless beacons using a power-aware scanning strategy. Supports all Dynamix Power profiles.</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides a variety of information regarding nearby WIFI access points, including name, SSID and signal strength.</privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.wirelessbeacons</contextType>
+		</supportedContextTypes>
+		<featureDependencies>
+		  <usesFeature android:name="android.hardware.wifi" android:required="true" />
+		</featureDependencies>
+		<permissions>
+      <permission>Context.WIFI_SERVICE</permission>
+      <permission>Permissions.MANAGE_BROADCAST_RECEIVERS</permission>    
+    </permissions>
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.wirelessbeacons_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+	
+	<contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.zephyrhxm"
+				pluginVersion="9.47.1" 
+				pluginType="AUTO"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.zephyrhxm.PluginFactory">
+		<name>Zephyr HxM Heart Rate Plugin</name>
+		<description>A push-based context plug-in that automatically reads heart rate information from a Zephyr HxM heart rate monitor that is connected via Bluetooth to the Android device.</description>
+		<supportedPrivacyRiskLevels>
+		  <privacyRiskLevel name="MEDIUM">Provides step events and associated speed.</privacyRiskLevel>
+			<privacyRiskLevel name="MAX">Provides heart rate information, plus step events and associated speed.</privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.zephyrhxm</contextType>
+		</supportedContextTypes>	
+    <featureDependencies>
+		  <usesFeature android:name="android.hardware.bluetooth" android:required="true" />
+		</featureDependencies>	    	
+		<permissions>
+      <permission>Context.INPUT_METHOD_SERVICE</permission>
+      <permission>Context.WINDOW_SERVICE</permission>
+      <permission>Permissions.MANAGE_BROADCAST_RECEIVERS</permission>    
+    </permissions>	
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.zephyrhxm_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+	
+	  <contextPlugin 
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.loadtester"
+        pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.loadtester.PluginFactory">
+		<name>Load Tester Plugin</name>
+		<description>Load tester.</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides configurable sample data in bytes. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.loadtester</contextType>
+		</supportedContextTypes>
+		<permissions/>
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.loadtester_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>	
+	
+	<contextPlugin 
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.barcode"
+				pluginVersion="9.47.1" 
+				pluginType="INTERACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47"  
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.barcode.PluginFactory">
+		<name>Barcode Context Plugin</name>
+		<description>An interactive pull-based plug-in that uses the device's inbuit camera to detect and decode a wide range of 1D and 2D barcodes.</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides barcode type along with the decoded barcode information.</privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.barcode</contextType>
+		</supportedContextTypes>
+    <featureDependencies>
+		  <usesFeature android:name="android.hardware.camera" android:required="true" />
+		  <usesFeature android:name="android.hardware.camera.autofocus" android:required="false" />
+		</featureDependencies>		
+    <permissions>
+      <permission>Context.INPUT_METHOD_SERVICE</permission>
+      <permission>Context.WINDOW_SERVICE</permission>
+      <permission>Permissions.LAUNCH_CONTEXT_ACQUISITION_ACTIVITY</permission>    
+    </permissions>		
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.barcode_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+	
+		<contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.ambientsound"
+				pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.ambientsound.PluginFactory">
+		<name>Ambient Sound Plugin</name>
+		<description>Detects the ambient sound level of the user's environment using the device's microphone.</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides the user's ambient sound level in dB. </privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.ambientsound</contextType>
+		</supportedContextTypes>
+		<featureDependencies>
+		  <usesFeature android:name="android.hardware.microphone" android:required="true" />
+		</featureDependencies>
+		<permissions/>
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.ambientsound_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+	
+	<contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.sampleplugin"
+				pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				max-framework-version="1.0.0"
+				requiresConfiguration="true"
+				hasConfigurationView="true"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.sampleplugin.PluginFactory">
+		<name>Sample Context Plugin</name>
+		<description>Sample Context Plugin description text that shows up in user interface operations. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="MAX">Description for MAX privacy risk. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</privacyRiskLevel>
+			<privacyRiskLevel name="HIGH">Description for HIGH privacy risk. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</privacyRiskLevel>
+			<privacyRiskLevel name="MEDIUM">Description for MEDIUM privacy risk. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</privacyRiskLevel>
+			<privacyRiskLevel name="LOW">Description for LOW privacy risk  . Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</privacyRiskLevel>		
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.sample_context_info</contextType>
+		</supportedContextTypes>		
+		<featureDependencies>
+		  <usesFeature android:name="android.hardware.wifi" android:required="true" />
+		</featureDependencies>
+		<permissions>
+      <permission>Context.INPUT_METHOD_SERVICE</permission>
+      <permission>Context.WINDOW_SERVICE</permission>    
+    </permissions>	
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.sampleplugin_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+	
+	<contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.nfc"
+				pluginVersion="9.47.1" 
+				pluginType="AUTO"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.nfc.PluginFactory">
+		<name>NFC Plugin</name>
+		<description>Continually scans the environment for detectable NFC tags.</description>
+		<supportedPrivacyRiskLevels>
+			<privacyRiskLevel name="LOW">Provides a variety of information regarding nearby NFC tags.</privacyRiskLevel>
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.nfc.tag</contextType>
+		  <contextType>org.ambientdynamix.contextplugins.nfc.smart_poster</contextType>
+		  <contextType>org.ambientdynamix.contextplugins.nfc.text_record</contextType>
+		  <contextType>org.ambientdynamix.contextplugins.nfc.uri_record</contextType>
+		</supportedContextTypes>
+		<featureDependencies>
+		  <usesFeature android:name="android.hardware.nfc" android:required="true" />
+		</featureDependencies>
+		<permissions>
+      <permission>Context.NFC_SERVICE</permission>    
+    </permissions>
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.nfc_9.47.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL">
+     <![CDATA[ 
+       <font color='white'>
+        <b>Version 1.0.0</b>
+        <p>Features:</p>
+        <ul>
+            <li>Full support for a broad range of NFC tags.</li>
+            <li>Experimental support for URI-based NDEF messages.</li>
+            <li>Experimental support for text-based NDEF messages.</li>
+            <li>Experimental support for SmartPoster-based NDEF messages.</li>
+        </ul>
+        </font>
+        ]]>
+    </updateMessage>
+	</contextPlugin>
+	
+  <contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.acousticfingerprint"
+				pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.acousticfingerprint.PluginFactory">
+		<name>Acoustic Fingerprint Plugin</name>
+		<description>Identifies songs using the device's microphone.</description>
+		<supportedPrivacyRiskLevels>			
+			<privacyRiskLevel name="LOW">Provides a collection of songs identified using the device's microphone.</privacyRiskLevel>			
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.acousticfingerprint.discoversongs</contextType>
+		</supportedContextTypes>		
+    <featureDependencies>
+		  <usesFeature android:name="android.hardware.microphone" android:required="true" />
+		</featureDependencies>			
+		<permissions/>	
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.acousticfingerprint_9.47.1.jar</installUrl>
+		<updateUrl/>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+	
+	  <contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="simple-network"
+        id="org.ambientdynamix.contextplugins.speechtotext"
+				pluginVersion="9.47.1" 
+				pluginType="REACTIVE"
+        		provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.2" 
+				minFrameworkVersion="0.9.47" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.speechtotext.PluginFactory">
+		<name>Speech To Text Plugin</name>
+		<description>Translates speech to text.</description>
+		<supportedPrivacyRiskLevels>			
+			<privacyRiskLevel name="HIGH">The user's spoken input as text.</privacyRiskLevel>			
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <contextType>org.ambientdynamix.contextplugins.voiceresults</contextType>
+		</supportedContextTypes>		
+    <featureDependencies>
+		  <usesFeature android:name="android.hardware.microphone" android:required="true" />
+		</featureDependencies>			
+		<permissions/>	
+		<installUrl>http://repo.ambientdynamix.org/dynamix/context_plugins/live8/org.ambientdynamix.contextplugins.speechtotext_9.47.1.jar</installUrl>
+		<updateUrl/>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+</contextPlugins>

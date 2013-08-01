@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:layout_width="fill_parent"
+   android:layout_height="fill_parent"
+   >
+	 
+<TextView android:text="@string/app_list_label" 
+				android:id="@+id/app_list_label" 
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content" 
+				android:editable="false" 
+				android:textAppearance="?android:attr/textAppearanceMedium"/>
+				<!--  android:textAppearance="?android:attr/textAppearanceMedium" -->
+				<!-- android:gravity="center_horizontal" -->
+				
+                  
+	<ListView android:layout_width="fill_parent"
+	              android:id="@android:id/list"
+	              android:layout_height="wrap_content"
+	              android:layout_weight="1"/>
+	              
+	<TextView android:id="@android:id/empty"
+               android:layout_width="fill_parent"
+               android:layout_height="wrap_content"
+               android:text="No authorized applications"
+               android:layout_gravity="top"
+               android:layout_weight="1"/>
+	              
+	              
+	<LinearLayout android:id="@+id/TableLayout01" 
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content"
+				android:layout_gravity="bottom"
+				>
+		
+			<ToggleButton android:layout_width="fill_parent" 
+				android:layout_height="wrap_content" 
+				android:id="@+id/DynamixActiveToggle" 
+				android:textOn="@string/dynamix_enable_toggle_on" 
+        		android:textOff="@string/dynamix_enable_toggle_off" 
+        		android:layout_gravity="bottom"/>	
+	</LinearLayout>            
+</LinearLayout>

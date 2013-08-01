@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DynamixUpdates version="1.0.0">
+  <trustedWebConnectorCerts>
+    <trustedCert alias="com.android.chrome" name= "Chrome for Android" fingerprint="38:91:8A:45:3D:07:19:93:54:F8:B1:9A:F0:5E:C6:56:2C:ED:57:88">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/com.android.chrome.crt</url>
+    </trustedCert>
+    <trustedCert alias="com.boatbrowser.free" name= "Boat Browser" fingerprint="C2:9D:66:EF:B9:C5:92:2C:C5:65:F0:72:A2:74:3D:8D:6C:5A:1D:B0">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/com.boatbrowser.free.crt</url>
+    </trustedCert>
+    <trustedCert alias="com.boatgo.browser" name= "Boat Browser Mini" fingerprint="C2:9D:66:EF:B9:C5:92:2C:C5:65:F0:72:A2:74:3D:8D:6C:5A:1D:B0">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/com.boatgo.browser.crt</url>
+    </trustedCert>
+    <trustedCert alias="mobi.mgeek.TunnyBrowser" name= "Dolphin Browser HD" fingerprint="5F:01:4A:D7:A8:A8:29:B1:BE:A3:D4:F5:3B:DA:56:31:30:84:AA:5B">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/mobi.mgeek.TunnyBrowser.crt</url>
+    </trustedCert>    
+    <trustedCert alias="com.dolphin.browser" name= "Dolphin Browser Mini" fingerprint="5F:01:4A:D7:A8:A8:29:B1:BE:A3:D4:F5:3B:DA:56:31:30:84:AA:5B">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/com.dolphin.browser.crt</url>
+    </trustedCert>
+    <trustedCert alias="com.google.android.browser" name= "Standard Android Browser" fingerprint="38:91:8A:45:3D:07:19:93:54:F8:B1:9A:F0:5E:C6:56:2C:ED:57:88">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/com.google.android.browser.crt</url>
+    </trustedCert>
+    <trustedCert alias="com.mx.browser" name= "Maxthon Android Web Browser" fingerprint="0F:9E:D8:4A:5C:70:51:08:62:00:C2:AE:6A:A7:DA:25:E1:2C:8C:45">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/com.mx.browser.crt</url>
+    </trustedCert>
+    <trustedCert alias="org.mozilla.firefox" name= "Firefox for Android" fingerprint="92:0F:48:76:A6:A5:7B:4A:6A:2F:4C:CA:F6:5F:7D:29:CE:26:FF:2C">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/org.mozilla.firefox.crt</url>
+    </trustedCert>
+    <trustedCert alias="com.skyfire.browser" name= "SkyFire Browser" fingerprint="A0:96:37:77:D5:2F:21:39:30:85:11:43:33:60:8E:E5:2D:BD:0B:6C">
+      <url>http://updates1.ambientdynamix.org/trustedwebconnectorcerts/com.skyfire.browser.crt</url>
+    </trustedCert>
+  </trustedWebConnectorCerts>
+</DynamixUpdates>

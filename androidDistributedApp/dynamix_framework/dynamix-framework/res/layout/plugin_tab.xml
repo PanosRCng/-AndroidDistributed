@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:layout_width="fill_parent"
+   android:layout_height="fill_parent">
+<!-- 	 
+<TextView android:text="@string/plug_list_label" 
+				android:id="@+id/plug_list_label" 
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content" 
+				android:editable="false" 
+				android:textAppearance="?android:attr/textAppearanceMedium"/>
+				 android:textAppearance="?android:attr/textAppearanceMedium" -->
+
+                  
+	<ListView android:id="@android:id/list" 
+			android:layout_height="wrap_content"
+			android:layout_width="fill_parent" 
+	        android:layout_weight="1"/>
+	              
+	<TextView android:id="@android:id/empty"
+               android:layout_width="fill_parent"
+               android:layout_height="wrap_content"
+               android:text="No plug-ins installed."
+               android:layout_gravity="top"
+               android:layout_weight="1"/>	  
+    <LinearLayout 
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content" android:gravity="center_horizontal|bottom">
+		
+			<Button android:layout_width="wrap_content" 
+				android:text="@string/btn_find_plugs"
+				android:layout_height="wrap_content" 
+				android:id="@+id/btn_find_plugs" 
+				android:layout_weight="1"
+        		/>
+        		
+        	<Button android:layout_width="wrap_content" 
+				android:text="@string/btn_install_plugs"
+				android:layout_height="wrap_content" 
+				android:id="@+id/btn_install_plugs"
+				android:layout_weight="1"
+        		/>		
+	</LinearLayout>              
+</LinearLayout>

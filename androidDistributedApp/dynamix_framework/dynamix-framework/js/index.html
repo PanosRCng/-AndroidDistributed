@@ -1,0 +1,96 @@
+<html>
+<head>
+<title>Dynamix Web Connector Example</title>
+<head>
+
+<script type="text/javascript" charset="utf-8" src="dynamix.js"></script>
+<script type="text/javascript" charset="utf-8" src="dynamix_listener.js"></script>
+</head>
+<body>
+	<h3>Dynamix Test Page 1</h3>
+	<form name="f1">
+		<p>
+			<input value="Bind To Dynamix" type="button"
+				onclick='JavaScript:Dynamix.bind()'>
+		</p>
+	</form>
+	<br>
+	<form name="f1">
+		<p>
+			<input value="Unbind Dynamix" type="button"
+				onclick='JavaScript:Dynamix.unbind()'>
+		</p>
+	</form>
+	<br>
+	<form name="f1">
+		<p>
+			<input value="Add Listener" type="button"
+				onclick='JavaScript:Dynamix.addDynamixListener()'>
+		</p>
+	</form>
+	<br>
+	<form name="f1">
+		<p>
+			<input value="Remove Listener" type="button"
+				onclick='JavaScript:Dynamix.removeDynamixListener()'>
+		</p>
+	</form>
+	<br>
+	<form name="f1">
+		<p>
+			<input value="Add Context Support" type="button"
+				onclick="JavaScript:Dynamix.addContextSupport('org.ambientdynamix.contextplugins.photodetector.luxvalue')">
+		</p>
+
+	</form>
+	<br>
+
+	<form name="f1">
+		<p>
+			<input value="Context Scan" type="button"
+				onclick="JavaScript:Dynamix.contextRequest('org.ambientdynamix.contextplugins.zeo', 'org.ambientdynamix.contextplugins.zeo.sleep.records')">
+		</p>
+
+	</form>
+	<br>
+	<form name="f1">
+		<p>
+			<input value="Remove Context Support" type="button"
+				onclick="JavaScript:Dynamix.removeContextSupportForContextType('org.ambientdynamix.contextplugins.photodetector.luxvalue')">
+		</p>
+
+	</form>
+	<br>
+
+
+	<form name="f1">
+		<p>
+			<input value="Get Context Support" type="button"
+				onclick="JavaScript:Dynamix.getContextSupport()">
+		</p>
+
+	</form>
+	<br>
+	<form name="f1">
+		<p>
+			<input value="Get Current Plugins" type="button"
+				onclick="JavaScript:Dynamix.getAllContextPluginInformation()">
+		</p>
+
+	</form>
+	
+		<br>
+	<form name="f1">
+		<p>
+			<input value="Test Security" type="button"
+				onclick="JavaScript:Dynamix.testSecurity()">
+		</p>
+
+	</form>
+	<br>
+	<br>
+
+	<div id="result"></div>
+	<div id="result2"></div>
+</body>
+</html>

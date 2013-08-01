@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contextPlugins version="1.0.0" xmlns:android="http://schemas.android.com/apk/res/android">
+ 
+  <contextPlugin
+        metadataVersion="1.0.0" 
+        repoType="nexus-rest"
+        id="org.ambientdynamix.contextplugins.pedometer"
+				pluginVersion="1.0.1" 
+				pluginType="AUTO"
+        provider="Dynamix Project"       
+				platform="android" 
+				minPlatformVersion="2.0" 
+				minFrameworkVersion="0.9.39" 
+				requiresConfiguration="false"
+				hasConfigurationView="false"
+				runtimeFactoryClass="org.ambientdynamix.contextplugins.pedometer.PluginFactory">
+		<name>Pedometer Context Plugin</name>
+		<description>A push-based context plug-in that provides step and associated force information.</description>
+		<supportedPrivacyRiskLevels>			
+			<privacyRiskLevel name="LOW">Provides step events with associated force information.</privacyRiskLevel>			
+		</supportedPrivacyRiskLevels>
+		<supportedContextTypes>
+		  <dataType>org.ambientdynamix.contextplugins.pedometer</dataType>
+		</supportedContextTypes>		
+    <featureDependencies>
+		  <usesFeature android:name="android.hardware.sensor.accelerometer" android:required="true" />
+		</featureDependencies>			
+		<permissions>
+      <permission>Context.INPUT_METHOD_SERVICE</permission>
+      <permission>Context.WINDOW_SERVICE</permission>
+      <permission>Context.SENSOR_SERVICE</permission>   
+      <permission>Context.CLIPBOARD_SERVICE</permission>    
+    </permissions>	
+		<installUrl>dynamix/org.ambientdynamix.contextplugins.pedometer_1.0.1.jar</installUrl>
+		<updateUrl></updateUrl>
+		<updateMessage priority="OPTIONAL"></updateMessage>
+	</contextPlugin>
+</contextPlugins>

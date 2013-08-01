@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="lib" path="lib/api-bridge-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/cglib-asm-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/db4o-7.12.156.14667-core-java5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/felix_3.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jackson-annotations-2.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jackson-core-asl-1.9.8.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/simple-xml-2.6.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gson-2.2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>
